@@ -1,51 +1,77 @@
+import { Card } from '@/components/ui/card';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { LoginSchema } from '@/schema/AuthSchema';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const DEFAULT_VALUE = {
+  email: '',
+  password: '',
+};
+
 const Login = () => {
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: DEFAULT_VALUE,
+    resolver: zodResolver(LoginSchema),
+  });
+
+  const Submit = (data) => {
+    console.log(data);
+    reset;
+  };
   return (
     <>
-      <div className="w-full max-w-md">
-        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="username"
-            >
-              Username
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="username"
-              type="text"
-              placeholder="Username"
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-              id="password"
-              type="password"
-              placeholder="******************"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-            >
-              Sign In
-            </button>
-            <a
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-              href="#"
-            >
-              Forgot Password?
-            </a>
-          </div>
-        </form>
+      <div>
+        <div className="mb-2">
+          <h1 className="text-foreground text-2xl">Welcome back </h1>
+          <p className="text-foreground/70 text-sm">
+            Sign in to access your dashboard.
+          </p>
+        </div>
+        <Card className="p-6 w-3xl">
+          <form onSubmit={handleSubmit(Submit)}>
+            <Field className="space-y-2">
+              <FieldLabel>Email</FieldLabel>
+              <Input {...register('email')} type="email" placeholder="Email" />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
+              <div className="flex justify-between text-center">
+                <FieldLabel>Password</FieldLabel>
+                <Button
+                  onClick={() => navigate('/forget-password')}
+                  variant="link"
+                  className="cursor-pointer"
+                >
+                  Forgot Password?
+                </Button>
+              </div>
+              <Input
+                {...register('password')}
+                type="password"
+                placeholder="Password"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
+              <Button type="submit" className="py-4 px-3 cursor-pointer">
+                Login
+              </Button>
+            </Field>
+          </form>
+        </Card>
       </div>
     </>
   );
