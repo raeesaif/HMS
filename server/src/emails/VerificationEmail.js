@@ -13,11 +13,8 @@ const verificationEmailTemplate = (firstname, verificationTokenUrl) => `
     <tr>
       <td align="center">
         <table width="520" cellpadding="0" cellspacing="0" style="background-color:#EDE4D0;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(45,80,22,0.10);border:1px solid #D4C9B0;">
-
-          <!-- ── Header ── -->
           <tr>
             <td style="background-color:#2D5016;padding:36px 40px 28px;text-align:center;">
-              <!-- Logo -->
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="vertical-align:middle;">
@@ -31,93 +28,46 @@ const verificationEmailTemplate = (firstname, verificationTokenUrl) => `
               <p style="color:#A8C98A;font-size:13px;margin:10px 0 0;letter-spacing:0.3px;">A home for thoughtful writing</p>
             </td>
           </tr>
-
-          <!-- ── Body ── -->
           <tr>
             <td style="padding:40px 40px 32px;">
-
-              <!-- Greeting -->
               <h1 style="font-size:22px;font-weight:700;color:#3D2B1A;margin:0 0 12px;line-height:1.3;">
                 Verify your email address 👋
               </h1>
               <p style="font-size:15px;color:#7A6547;line-height:1.7;margin:0 0 32px;">
                 Hello <strong style="color:#3D2B1A;">${firstname}</strong>, thanks for signing up for Blogify!
-                To complete your registration and start reading and writing, please enter
-                the one-time code below.
+                Please click the button below to verify your email.
               </p>
-
-              <!-- OTP label -->
-              <p style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A6547;margin:0 0 12px;">
-                Your verification code
-              </p>
-
-              <!-- OTP Box -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F0E8;border:2px solid #2D5016;border-radius:12px;margin-bottom:10px;">
                 <tr>
                   <td style="padding:28px 0;text-align:center;">
-                     <p>Please click the button below to verify your email.</p>
-
-        <a href="${verificationTokenUrl}">
-          Verify Email
-        </a>
+                    <a href="${verificationTokenUrl}" style="background-color:#2D5016;color:#F5F0E8;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">
+                      Verify Email
+                    </a>
                   </td>
                 </tr>
               </table>
-
-              <!-- Expiry -->
               <p style="font-size:12px;color:#7A6547;margin:0 0 32px;text-align:center;">
-                This code expires in <strong style="color:#2D5016;">10 minutes</strong>. Do not share it with anyone.
+                This link expires in <strong style="color:#2D5016;">10 minutes</strong>. Do not share it with anyone.
               </p>
-
-              <!-- Divider -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
-                <tr>
-                  <td style="border-top:1px solid #D4C9B0;font-size:0;line-height:0;">&nbsp;</td>
-                </tr>
-              </table>
-
-              <!-- Security notice -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F0E8;border-left:3px solid #C4A882;border-radius:0 8px 8px 0;margin-bottom:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F0E8;border-left:3px solid #C4A882;border-radius:0 8px 8px 0;">
                 <tr>
                   <td style="padding:14px 16px;">
                     <p style="font-size:13px;color:#7A6547;line-height:1.6;margin:0;">
                       <strong style="color:#3D2B1A;">Didn't sign up for Blogify?</strong>
-                      You can safely ignore this email. Someone may have entered your address
-                      by mistake. Your account will not be created unless this code is entered.
+                      You can safely ignore this email.
                     </p>
                   </td>
                 </tr>
               </table>
-
             </td>
           </tr>
-
-          <!-- ── Footer ── -->
           <tr>
             <td style="background-color:#E4D9C4;border-top:1px solid #D4C9B0;padding:24px 40px;text-align:center;">
               <p style="font-size:12px;color:#7A6547;line-height:1.7;margin:0;">
-                This email was sent to you because you recently created a Blogify account.<br/>
-                If you did not make this request, you can safely ignore this email.
-              </p>
-              <table cellpadding="0" cellspacing="0" style="margin:12px auto 0;">
-                <tr>
-                  <td style="padding:0 8px;">
-                    <a href="#" style="font-size:12px;color:#7A6547;text-decoration:none;">Help Centre</a>
-                  </td>
-                  <td style="padding:0 8px;border-left:1px solid #C4A882;">
-                    <a href="#" style="font-size:12px;color:#7A6547;text-decoration:none;">Privacy Policy</a>
-                  </td>
-                  <td style="padding:0 8px;border-left:1px solid #C4A882;">
-                    <a href="#" style="font-size:12px;color:#7A6547;text-decoration:none;">Unsubscribe</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="font-size:12px;color:#C4A882;margin:16px 0 0;">
                 © ${new Date().getFullYear()} Blogify · All rights reserved
               </p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
