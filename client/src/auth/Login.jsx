@@ -6,14 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { LoginSchema } from '@/schema/AuthSchema';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-const DEFAULT_VALUE = {
-  email: '',
-  password: '',
-};
+import { useState } from 'react';
+import { EyeOff, Eye } from 'lucide-react';
+const DEFAULT_VALUE = { email: '', password: '' };
 
 const Login = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -27,53 +26,73 @@ const Login = () => {
 
   const Submit = (data) => {
     console.log(data);
-    reset;
+    reset();
   };
+
   return (
-    <>
-      <div>
-        <div className="mb-2">
-          <h1 className="text-foreground text-2xl">Welcome back </h1>
-          <p className="text-foreground/70 text-sm">
-            Sign in to access your dashboard.
-          </p>
-        </div>
-        <Card className="p-6 w-3xl">
-          <form onSubmit={handleSubmit(Submit)}>
-            <Field className="space-y-2">
+    <div className="w-full max-w-md">
+      <div className="mb-6">
+        <h1 className="text-foreground text-2xl font-bold">Welcome back</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Sign in to access your dashboard.
+        </p>
+      </div>
+      <Card className="p-6">
+        <form onSubmit={handleSubmit(Submit)}>
+          <Field className="space-y-4">
+            <div className="space-y-1">
               <FieldLabel>Email</FieldLabel>
-              <Input {...register('email')} type="email" placeholder="Email" />
+              <Input
+                {...register('email')}
+                type="email"
+                placeholder="Enter your email"
+              />
               {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
+                </p>
               )}
-              <div className="flex justify-between text-center">
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
                 <FieldLabel>Password</FieldLabel>
                 <Button
+                  type="button"
                   onClick={() => navigate('/forget-password')}
                   variant="link"
-                  className="cursor-pointer"
+                  className="cursor-pointer p-0 h-auto text-sm"
                 >
                   Forgot Password?
                 </Button>
               </div>
-              <Input
-                {...register('password')}
-                type="password"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <Input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer "
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {errors.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-destructive text-sm">
                   {errors.password.message}
                 </p>
               )}
-              <Button type="submit" className="py-4 px-3 cursor-pointer">
-                Login
-              </Button>
-            </Field>
-          </form>
-        </Card>
-      </div>
-    </>
+            </div>
+            <Button type="submit" className="w-full cursor-pointer">
+              Login
+            </Button>
+          </Field>
+        </form>
+      </Card>
+    </div>
   );
 };
 

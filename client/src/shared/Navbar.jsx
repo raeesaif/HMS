@@ -1,22 +1,6 @@
-import {
-  ChevronDown,
-  LogOut,
-  LayoutDashboard,
-  User as UserIcon,
-} from 'lucide-react';
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link, useNavigate } from 'react-router-dom';
-import { HeartPulse } from 'lucide-react';
+import { HeartPulse, ArrowRight } from 'lucide-react';
 const links = [
   { to: '#', label: 'Features' },
   { to: '#', label: 'Pricing' },
@@ -31,7 +15,7 @@ const Navbar = () => {
     <nav className="fixed top-0 inset-x-0 z-50 h-16 bg-card/80 backdrop-blur-xl border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
         {/* ── Logo ── */}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center cursor-pointer ">
           <HeartPulse className="bg-primary rounded-lg  py-2 px-2 text-white w-10 h-10  " />
           <Link to="/" className="text-2xl font-medium ">
             MediCore
@@ -65,8 +49,11 @@ const Navbar = () => {
             >
               Login
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold cursor-pointer px-3 ">
-              Get Starting
+            <Button
+              onClick={() => navigate('/login')}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold cursor-pointer px-3 "
+            >
+              Get Starting <ArrowRight className="h-4 w-4" />
             </Button>
           </>
         </div>

@@ -9,7 +9,7 @@ const sendEmail = async (to, subject, html) => {
     },
   });
   await transport.sendMail({
-    from: `"Blogify" <${process.env.EMAIL_USER}>`,
+    from: `"HMS" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,
