@@ -1,0 +1,93 @@
+export const invoicesData = [
+  {
+    id: 'INV-8834',
+    patient: 'Ama Owusu',
+    date: '14 Jul 2026',
+    method: 'Insurance',
+    amount: 1240.0,
+    status: 'Paid',
+  },
+  {
+    id: 'INV-8833',
+    patient: 'Kwesi Mensah',
+    date: '14 Jul 2026',
+    method: 'Cash',
+    amount: 3890.5,
+    status: 'Pending',
+  },
+  {
+    id: 'INV-8832',
+    patient: 'Yaa Serwaa',
+    date: '13 Jul 2026',
+    method: 'Card',
+    amount: 420.0,
+    status: 'Paid',
+  },
+  {
+    id: 'INV-8831',
+    patient: 'Kojo Antwi',
+    date: '13 Jul 2026',
+    method: 'Insurance',
+    amount: 7120.0,
+    status: 'Overdue',
+  },
+  {
+    id: 'INV-8830',
+    patient: 'Efua Baidoo',
+    date: '12 Jul 2026',
+    method: 'Card',
+    amount: 2150.75,
+    status: 'Paid',
+  },
+  {
+    id: 'INV-8829',
+    patient: 'Nana Asare',
+    date: '11 Jul 2026',
+    method: 'Insurance',
+    amount: 5600.0,
+    status: 'Pending',
+  },
+  {
+    id: 'INV-8828',
+    patient: 'Adjoa Frimpong',
+    date: '11 Jul 2026',
+    method: 'Cash',
+    amount: 960.0,
+    status: 'Paid',
+  },
+  {
+    id: 'INV-8827',
+    patient: 'Kofi Duah',
+    date: '10 Jul 2026',
+    method: 'Insurance',
+    amount: 8430.0,
+    status: 'Overdue',
+  },
+];
+
+export const BILLING_SUMMARY = [
+  {
+    label: 'Collected (July)',
+    value: '$482,910',
+    badge: 'bg-emerald-50 text-emerald-700',
+    dot: 'bg-emerald-500',
+  },
+  {
+    label: 'Outstanding',
+    value: '$68,420',
+    badge: 'bg-amber-50 text-amber-700',
+    dot: 'bg-amber-500',
+  },
+  {
+    label: 'Overdue',
+    value: '$21,340',
+    badge: 'bg-red-50 text-red-700',
+    dot: 'bg-red-500',
+  },
+  {
+    label: 'Insurance pending',
+    value: '$142,850',
+    badge: 'bg-amber-50 text-amber-700',
+    dot: 'bg-amber-500',
+  },
+];
