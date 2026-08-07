@@ -123,18 +123,13 @@ const SideBarLayout = () => {
         path: '/nurse/patients',
       },
       {
-        icon: <CalendarDays size={18} />,
-        name: 'Appointments',
-        path: '/nurse/appointments',
-      },
-      {
         icon: <Activity size={18} />,
         name: 'Vitals Monitoring',
         path: '/nurse/vitals',
       },
       {
         icon: <Pill size={18} />,
-        name: 'Medication Schedule',
+        name: 'Medication Administration',
         path: '/nurse/medication',
       },
       {
@@ -225,6 +220,53 @@ const SideBarLayout = () => {
         path: '/reception/settings',
       },
     ],
+    patient: [
+      {
+        icon: <LayoutDashboard size={18} />,
+        name: 'Dashboard',
+        path: '/patient/dashboard',
+      },
+      {
+        icon: <CalendarDays size={18} />,
+        name: 'Appointments',
+        path: '/patient/appointments',
+      },
+      {
+        icon: <ClipboardList size={18} />,
+        name: 'Medical Records',
+        path: '/patient/medical-records',
+      },
+      {
+        icon: <Pill size={18} />,
+        name: 'Prescriptions',
+        path: '/patient/prescriptions',
+      },
+      {
+        icon: <TestTube size={18} />,
+        name: 'Lab Reports',
+        path: '/patient/lab-reports',
+      },
+      {
+        icon: <Receipt size={18} />,
+        name: 'Billing',
+        path: '/patient/billing',
+      },
+      {
+        icon: <Bell size={18} />,
+        name: 'Notifications',
+        path: '/patient/notifications',
+      },
+      {
+        icon: <User size={18} />,
+        name: 'Profile',
+        path: '/patient/profile',
+      },
+      {
+        icon: <Settings size={18} />,
+        name: 'Settings',
+        path: '/patient/settings',
+      },
+    ],
   };
 
   const roleLabel = {
@@ -232,11 +274,12 @@ const SideBarLayout = () => {
     doctor: 'Doctor workspace',
     nurse: 'Nurse workspace',
     receptionist: 'Front desk workspace',
+    patient: 'Patient workspace',
   };
 
-  const role = 'receptionist';
+  const role = 'nurse';
   // const navigation = roleNavigation[role] || roleNavigation.admin;
-  const navigation = roleNavigation.receptionist;
+  const navigation = roleNavigation.nurse;
   const handleLogout = () => {
     navigate('/login');
   };

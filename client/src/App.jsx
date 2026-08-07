@@ -13,8 +13,17 @@ import AdminBilling from './pages/AdminDashboard/AdminBilling';
 import AdminPharmacy from './pages/AdminDashboard/AdminPharmacy';
 import AdminReports from './pages/AdminDashboard/AdminReports';
 import NurseDashboard from './pages/NurseDashboard/NurseDashboard';
+import AssignedPatients from './pages/NurseDashboard/AssignedPatients';
+import VitalsMonitoring from './pages/NurseDashboard/VitalsMonitoring';
+import MedicationAdministration from './pages/NurseDashboard/MedicationAdministration';
+import BedsWards from './pages/NurseDashboard/BedsWards';
+import Tasks from './pages/NurseDashboard/Tasks';
+import Notifications from './pages/NurseDashboard/Notifications';
+import Profile from './pages/NurseDashboard/Profile';
+import Settings from './pages/NurseDashboard/Settings';
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
 import ReceptionistDashboard from './pages/ReceptionistDashboard/ReceptionistDashboard';
+import PatientDashboard from './pages/PatientDashboard/PatientDasboard';
 const App = () => {
   return (
     <>
@@ -36,6 +45,14 @@ const App = () => {
             <Route path="/admin/reports" element={<AdminReports />} />
             {/* Nurse Dashboard */}
             <Route path="/nurse/dashboard" element={<NurseDashboard />} />
+            <Route path="/nurse/patients" element={<AssignedPatients />} />
+            <Route path="/nurse/vitals" element={<VitalsMonitoring />} />
+            <Route path="/nurse/medication" element={<MedicationAdministration />} />
+            <Route path="/nurse/beds" element={<BedsWards />} />
+            <Route path="/nurse/tasks" element={<Tasks />} />
+            <Route path="/nurse/notifications" element={<Notifications />} />
+            <Route path="/nurse/profile" element={<Profile />} />
+            <Route path="/nurse/settings" element={<Settings />} />
             {/* Doctor Dashboard */}
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
             {/* Receptionist Dashboard */}
@@ -43,6 +60,8 @@ const App = () => {
               path="/receptionist/dashboard"
               element={<ReceptionistDashboard />}
             />
+            {/* Patient Dashboard */}
+            <Route path="/patient/dashboard" element={<PatientDashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>
