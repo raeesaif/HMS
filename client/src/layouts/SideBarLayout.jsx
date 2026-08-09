@@ -277,9 +277,9 @@ const SideBarLayout = () => {
     patient: 'Patient workspace',
   };
 
-  const role = 'nurse';
+  const role = 'doctor';
   // const navigation = roleNavigation[role] || roleNavigation.admin;
-  const navigation = roleNavigation.nurse;
+  const navigation = roleNavigation.doctor;
   const handleLogout = () => {
     navigate('/login');
   };
@@ -306,7 +306,6 @@ const SideBarLayout = () => {
                   {({ isActive }) => (
                     <SidebarMenuButton
                       isActive={isActive}
-                      asChild
                       className="text-white/80 hover:bg-white/10 hover:text-white data-[active=true]:bg-black/15 data-[active=true]:text-white data-[active=true]:font-semibold cursor-pointer "
                     >
                       <span className="flex items-center gap-3">

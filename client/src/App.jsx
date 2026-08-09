@@ -22,6 +22,14 @@ import Notifications from './pages/NurseDashboard/Notifications';
 import Profile from './pages/NurseDashboard/Profile';
 import Settings from './pages/NurseDashboard/Settings';
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard';
+import DoctorAppointments from './pages/DoctorDashboard/Appointments';
+import DoctorPatients from './pages/DoctorDashboard/Patients';
+import DoctorPrescriptions from './pages/DoctorDashboard/Prescriptions';
+import DoctorMedicalRecords from './pages/DoctorDashboard/MedicalRecords';
+import DoctorNotifications from './pages/DoctorDashboard/Notifications';
+import DoctorLabReports from './pages/DoctorDashboard/LabReports';
+import DoctorProfile from './pages/DoctorDashboard/Profile';
+import DoctorSettings from './pages/DoctorDashboard/Settings';
 import ReceptionistDashboard from './pages/ReceptionistDashboard/ReceptionistDashboard';
 import PatientDashboard from './pages/PatientDashboard/PatientDasboard';
 const App = () => {
@@ -55,6 +63,14 @@ const App = () => {
             <Route path="/nurse/settings" element={<Settings />} />
             {/* Doctor Dashboard */}
             <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+            <Route path="/doctor/appointments" element={<DoctorAppointments />} />
+            <Route path="/doctor/patients" element={<DoctorPatients />} />
+            <Route path="/doctor/prescriptions" element={<DoctorPrescriptions />} />
+            <Route path="/doctor/medical-records" element={<DoctorMedicalRecords />} />
+            <Route path="/doctor/notifications" element={<DoctorNotifications />} />
+            <Route path="/doctor/lab-reports" element={<DoctorLabReports />} />
+            <Route path="/doctor/profile" element={<DoctorProfile />} />
+            <Route path="/doctor/settings" element={<DoctorSettings />} />
             {/* Receptionist Dashboard */}
             <Route
               path="/receptionist/dashboard"
