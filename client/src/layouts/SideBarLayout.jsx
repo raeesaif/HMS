@@ -277,9 +277,9 @@ const SideBarLayout = () => {
     patient: 'Patient workspace',
   };
 
-  const role = 'doctor';
+  const role = 'receptionist';
   // const navigation = roleNavigation[role] || roleNavigation.admin;
-  const navigation = roleNavigation.doctor;
+  const navigation = roleNavigation.receptionist;
   const handleLogout = () => {
     navigate('/login');
   };

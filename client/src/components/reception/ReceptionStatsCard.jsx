@@ -1,0 +1,52 @@
+import {
+  Activity,
+  AlertTriangle,
+  BedDouble,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Receipt,
+  Stethoscope,
+  UserPlus,
+  Users,
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+
+const iconMap = {
+  calendar: CalendarDays,
+  check: CheckCircle2,
+  clock: Clock3,
+  bed: BedDouble,
+  doctor: Stethoscope,
+  emergency: Activity,
+  billing: Receipt,
+  register: UserPlus,
+  users: Users,
+  alert: AlertTriangle,
+};
+
+const toneStyles = {
+  blue: 'bg-sky-100 text-sky-600',
+  amber: 'bg-amber-100 text-amber-500',
+  green: 'bg-emerald-100 text-emerald-500',
+  sky: 'bg-sky-100 text-sky-600',
+  red: 'bg-rose-100 text-rose-500',
+  purple: 'bg-violet-100 text-violet-600',
+  slate: 'bg-slate-100 text-slate-600',
+};
+
+export function ReceptionStatsCard({ icon, tone = 'blue', value, title, description }) {
+  const Icon = iconMap[icon] ?? CalendarDays;
+  return (
+    <Card className="gap-0 rounded-xl border-border py-5 shadow-sm">
+      <CardContent className="px-5">
+        <div className={`mb-4 flex size-10 items-center justify-center rounded-xl ${toneStyles[tone] ?? toneStyles.blue}`}>
+          <Icon className="size-5" />
+        </div>
+        <p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p>
+        <p className="mt-1 text-sm font-medium text-slate-700">{title}</p>
+        {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+      </CardContent>
+    </Card>
+  );
+}

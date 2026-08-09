@@ -31,6 +31,17 @@ import DoctorLabReports from './pages/DoctorDashboard/LabReports';
 import DoctorProfile from './pages/DoctorDashboard/Profile';
 import DoctorSettings from './pages/DoctorDashboard/Settings';
 import ReceptionistDashboard from './pages/ReceptionistDashboard/ReceptionistDashboard';
+import ReceptionPatients from './pages/ReceptionistDashboard/Patients';
+import ReceptionAppointments from './pages/ReceptionistDashboard/Appointments';
+import ReceptionCheckIns from './pages/ReceptionistDashboard/CheckIns';
+import ReceptionBeds from './pages/ReceptionistDashboard/Beds';
+import ReceptionDoctors from './pages/ReceptionistDashboard/Doctors';
+import ReceptionQueue from './pages/ReceptionistDashboard/Queue';
+import ReceptionEmergency from './pages/ReceptionistDashboard/Emergency';
+import ReceptionBilling from './pages/ReceptionistDashboard/Billing';
+import ReceptionNotifications from './pages/ReceptionistDashboard/Notifications';
+import ReceptionProfile from './pages/ReceptionistDashboard/Profile';
+import ReceptionSettings from './pages/ReceptionistDashboard/Settings';
 import PatientDashboard from './pages/PatientDashboard/PatientDasboard';
 const App = () => {
   return (
@@ -72,10 +83,18 @@ const App = () => {
             <Route path="/doctor/profile" element={<DoctorProfile />} />
             <Route path="/doctor/settings" element={<DoctorSettings />} />
             {/* Receptionist Dashboard */}
-            <Route
-              path="/receptionist/dashboard"
-              element={<ReceptionistDashboard />}
-            />
+            <Route path="/reception/dashboard" element={<ReceptionistDashboard />} />
+            <Route path="/reception/patients" element={<ReceptionPatients />} />
+            <Route path="/reception/appointments" element={<ReceptionAppointments />} />
+            <Route path="/reception/check-ins" element={<ReceptionCheckIns />} />
+            <Route path="/reception/beds" element={<ReceptionBeds />} />
+            <Route path="/reception/doctors" element={<ReceptionDoctors />} />
+            <Route path="/reception/queue" element={<ReceptionQueue />} />
+            <Route path="/reception/emergency" element={<ReceptionEmergency />} />
+            <Route path="/reception/billing" element={<ReceptionBilling />} />
+            <Route path="/reception/notifications" element={<ReceptionNotifications />} />
+            <Route path="/reception/profile" element={<ReceptionProfile />} />
+            <Route path="/reception/settings" element={<ReceptionSettings />} />
             {/* Patient Dashboard */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
           </Route>
