@@ -42,7 +42,15 @@ import ReceptionBilling from './pages/ReceptionistDashboard/Billing';
 import ReceptionNotifications from './pages/ReceptionistDashboard/Notifications';
 import ReceptionProfile from './pages/ReceptionistDashboard/Profile';
 import ReceptionSettings from './pages/ReceptionistDashboard/Settings';
-import PatientDashboard from './pages/PatientDashboard/PatientDasboard';
+import PatientDashboard from './pages/PatientDashboard/Dashboard';
+import PatientAppointments from './pages/PatientDashboard/Appointments';
+import PatientMedicalRecords from './pages/PatientDashboard/MedicalRecords';
+import PatientPrescriptions from './pages/PatientDashboard/Prescriptions';
+import PatientLabReports from './pages/PatientDashboard/LabReports';
+import PatientBilling from './pages/PatientDashboard/Billing';
+import PatientNotifications from './pages/PatientDashboard/Notifications';
+import PatientProfile from './pages/PatientDashboard/Profile';
+import PatientSettings from './pages/PatientDashboard/Settings';
 const App = () => {
   return (
     <>
@@ -97,6 +105,14 @@ const App = () => {
             <Route path="/reception/settings" element={<ReceptionSettings />} />
             {/* Patient Dashboard */}
             <Route path="/patient/dashboard" element={<PatientDashboard />} />
+            <Route path="/patient/appointments" element={<PatientAppointments />} />
+            <Route path="/patient/medical-records" element={<PatientMedicalRecords />} />
+            <Route path="/patient/prescriptions" element={<PatientPrescriptions />} />
+            <Route path="/patient/lab-reports" element={<PatientLabReports />} />
+            <Route path="/patient/billing" element={<PatientBilling />} />
+            <Route path="/patient/notifications" element={<PatientNotifications />} />
+            <Route path="/patient/profile" element={<PatientProfile />} />
+            <Route path="/patient/settings" element={<PatientSettings />} />
           </Route>
         </Routes>
       </BrowserRouter>
