@@ -51,6 +51,20 @@ import PatientBilling from './pages/PatientDashboard/Billing';
 import PatientNotifications from './pages/PatientDashboard/Notifications';
 import PatientProfile from './pages/PatientDashboard/Profile';
 import PatientSettings from './pages/PatientDashboard/Settings';
+import { SuperAdminLayout } from './layouts/SuperAdminLayout';
+import SuperAdminDashboard from './pages/SuperAdminDashboard/Dashboard';
+import SuperAdminHospitals from './pages/SuperAdminDashboard/Hospitals';
+import SuperAdminUsers from './pages/SuperAdminDashboard/Users';
+import SuperAdminSubscriptions from './pages/SuperAdminDashboard/Subscriptions';
+import SuperAdminFeatures from './pages/SuperAdminDashboard/Features';
+import SuperAdminBilling from './pages/SuperAdminDashboard/Billing';
+import SuperAdminAnalytics from './pages/SuperAdminDashboard/Analytics';
+import SuperAdminActivityLogs from './pages/SuperAdminDashboard/ActivityLogs';
+import SuperAdminSupport from './pages/SuperAdminDashboard/Support';
+import SuperAdminNotifications from './pages/SuperAdminDashboard/Notifications';
+import SuperAdminSystemSettings from './pages/SuperAdminDashboard/SystemSettings';
+import SuperAdminProfile from './pages/SuperAdminDashboard/Profile';
+import SuperAdminSecurity from './pages/SuperAdminDashboard/Security';
 const App = () => {
   return (
     <>
@@ -113,6 +127,22 @@ const App = () => {
             <Route path="/patient/notifications" element={<PatientNotifications />} />
             <Route path="/patient/profile" element={<PatientProfile />} />
             <Route path="/patient/settings" element={<PatientSettings />} />
+          </Route>
+          <Route element={<SuperAdminLayout />}>
+            {/* Super Admin */}
+            <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+            <Route path="/super-admin/hospitals" element={<SuperAdminHospitals />} />
+            <Route path="/super-admin/users" element={<SuperAdminUsers />} />
+            <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
+            <Route path="/super-admin/features" element={<SuperAdminFeatures />} />
+            <Route path="/super-admin/billing" element={<SuperAdminBilling />} />
+            <Route path="/super-admin/analytics" element={<SuperAdminAnalytics />} />
+            <Route path="/super-admin/activity-logs" element={<SuperAdminActivityLogs />} />
+            <Route path="/super-admin/support" element={<SuperAdminSupport />} />
+            <Route path="/super-admin/notifications" element={<SuperAdminNotifications />} />
+            <Route path="/super-admin/system-settings" element={<SuperAdminSystemSettings />} />
+            <Route path="/super-admin/profile" element={<SuperAdminProfile />} />
+            <Route path="/super-admin/security" element={<SuperAdminSecurity />} />
           </Route>
         </Routes>
       </BrowserRouter>

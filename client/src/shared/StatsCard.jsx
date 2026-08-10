@@ -1,3 +1,4 @@
+import { TrendingDown, TrendingUp } from 'lucide-react';
 import {
   Card,
   CardDescription,
@@ -34,8 +35,11 @@ const StateCard = ({
   color = 'gray',
   value = '',
   description = '',
+  trend,
+  comparison,
 }) => {
   const c = colorMap[color] ?? colorMap.gray;
+  const isDown = trend?.direction === 'down';
   return (
     <Card
       className={`border ${c.border} rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300`}
@@ -48,6 +52,15 @@ const StateCard = ({
             <CardDescription className={`mt-1 ${c.text}`}>
               {description}
             </CardDescription>
+          )}
+          {trend && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs">
+              <span className={`inline-flex items-center gap-0.5 font-medium ${isDown ? 'text-rose-600' : 'text-emerald-600'}`}>
+                {isDown ? <TrendingDown className="size-3.5" /> : <TrendingUp className="size-3.5" />}
+                {trend.value}
+              </span>
+              {comparison && <span className="text-slate-400">{comparison}</span>}
+            </div>
           )}
         </div>
         <div className={`py-3 px-3 rounded-lg ${c.bg} ${c.text} text-xl`}>

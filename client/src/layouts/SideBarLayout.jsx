@@ -1,25 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  Stethoscope,
-  BedDouble,
-  Receipt,
-  Pill,
-  BarChart3,
-  ClipboardList,
-  Activity,
-  Bell,
-  LogOut,
-  HeartPulse,
-  User,
-  Settings,
-  FileText,
-  TestTube,
-  UsersRound,
-} from 'lucide-react';
+import { LogOut, HeartPulse } from 'lucide-react';
 import {
   Sidebar,
   SidebarHeader,
@@ -28,258 +9,44 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from '@/components/ui/sidebar';
+import { roleNavigation, roleLabel } from '@/config/sidebarConfig';
 
-const SideBarLayout = () => {
+function NavItem({ item }) {
+  return (
+    <SidebarMenuItem key={item.name}>
+      <NavLink to={item.path}>
+        {({ isActive }) => (
+          <SidebarMenuButton
+            isActive={isActive}
+            className="text-white/80 hover:bg-white/10 hover:text-white data-[active=true]:bg-black/15 data-[active=true]:text-white data-[active=true]:font-semibold cursor-pointer "
+          >
+            <span className="flex items-center gap-3">
+              <item.icon size={18} />
+              <span>{item.name}</span>
+            </span>
+          </SidebarMenuButton>
+        )}
+      </NavLink>
+    </SidebarMenuItem>
+  );
+}
+
+const SideBarLayout = ({ role: roleProp } = {}) => {
   const navigate = useNavigate();
 
-  const roleNavigation = {
-    admin: [
-      {
-        icon: <LayoutDashboard size={18} />,
-        name: 'Dashboard',
-        path: '/admin/dashboard',
-      },
-      { icon: <Users size={18} />, name: 'Patients', path: '/admin/patients' },
-      {
-        icon: <Stethoscope size={18} />,
-        name: 'Doctors & Staff',
-        path: '/admin/staff',
-      },
-      {
-        icon: <CalendarDays size={18} />,
-        name: 'Appointments',
-        path: '/admin/appointments',
-      },
-      {
-        icon: <BedDouble size={18} />,
-        name: 'Beds & Wards',
-        path: '/admin/beds',
-      },
-      { icon: <Receipt size={18} />, name: 'Billing', path: '/admin/billing' },
-      { icon: <Pill size={18} />, name: 'Pharmacy', path: '/admin/pharmacy' },
-      {
-        icon: <BarChart3 size={18} />,
-        name: 'Reports',
-        path: '/admin/reports',
-      },
-    ],
-    doctor: [
-      {
-        icon: <LayoutDashboard size={18} />,
-        name: 'Dashboard',
-        path: '/doctor/dashboard',
-      },
-      {
-        icon: <CalendarDays size={18} />,
-        name: 'Appointments',
-        path: '/doctor/appointments',
-      },
-      {
-        icon: <Users size={18} />,
-        name: 'My Patients',
-        path: '/doctor/patients',
-      },
-      {
-        icon: <ClipboardList size={18} />,
-        name: 'Prescriptions',
-        path: '/doctor/prescriptions',
-      },
-      {
-        icon: <FileText size={18} />,
-        name: 'Medical Records',
-        path: '/doctor/medical-records',
-      },
-      {
-        icon: <TestTube size={18} />,
-        name: 'Lab Reports',
-        path: '/doctor/lab-reports',
-      },
-      {
-        icon: <Bell size={18} />,
-        name: 'Notifications',
-        path: '/doctor/notifications',
-      },
-      {
-        icon: <User size={18} />,
-        name: 'Profile',
-        path: '/doctor/profile',
-      },
-      {
-        icon: <Settings size={18} />,
-        name: 'Settings',
-        path: '/doctor/settings',
-      },
-    ],
-    nurse: [
-      {
-        icon: <LayoutDashboard size={18} />,
-        name: 'Dashboard',
-        path: '/nurse/dashboard',
-      },
-      {
-        icon: <Users size={18} />,
-        name: 'Assigned Patients',
-        path: '/nurse/patients',
-      },
-      {
-        icon: <Activity size={18} />,
-        name: 'Vitals Monitoring',
-        path: '/nurse/vitals',
-      },
-      {
-        icon: <Pill size={18} />,
-        name: 'Medication Administration',
-        path: '/nurse/medication',
-      },
-      {
-        icon: <BedDouble size={18} />,
-        name: 'Beds & Wards',
-        path: '/nurse/beds',
-      },
-      {
-        icon: <ClipboardList size={18} />,
-        name: 'Tasks',
-        path: '/nurse/tasks',
-      },
-      {
-        icon: <Bell size={18} />,
-        name: 'Notifications',
-        path: '/nurse/notifications',
-      },
-      {
-        icon: <User size={18} />,
-        name: 'Profile',
-        path: '/nurse/profile',
-      },
-      {
-        icon: <Settings size={18} />,
-        name: 'Settings',
-        path: '/nurse/settings',
-      },
-    ],
-    receptionist: [
-      {
-        icon: <LayoutDashboard size={18} />,
-        name: 'Dashboard',
-        path: '/reception/dashboard',
-      },
-      {
-        icon: <Users size={18} />,
-        name: 'Patients',
-        path: '/reception/patients',
-      },
-      {
-        icon: <CalendarDays size={18} />,
-        name: 'Appointments',
-        path: '/reception/appointments',
-      },
-      {
-        icon: <ClipboardList size={18} />,
-        name: 'Check-ins',
-        path: '/reception/check-ins',
-      },
-      {
-        icon: <BedDouble size={18} />,
-        name: 'Bed Management',
-        path: '/reception/beds',
-      },
-      {
-        icon: <Stethoscope size={18} />,
-        name: 'Doctors On Duty',
-        path: '/reception/doctors',
-      },
-      {
-        icon: <UsersRound size={18} />,
-        name: 'Waiting Queue',
-        path: '/reception/queue',
-      },
-      {
-        icon: <Activity size={18} />,
-        name: 'Emergency Patients',
-        path: '/reception/emergency',
-      },
-      {
-        icon: <Receipt size={18} />,
-        name: 'Billing',
-        path: '/reception/billing',
-      },
-      {
-        icon: <Bell size={18} />,
-        name: 'Notifications',
-        path: '/reception/notifications',
-      },
-      {
-        icon: <User size={18} />,
-        name: 'Profile',
-        path: '/reception/profile',
-      },
-      {
-        icon: <Settings size={18} />,
-        name: 'Settings',
-        path: '/reception/settings',
-      },
-    ],
-    patient: [
-      {
-        icon: <LayoutDashboard size={18} />,
-        name: 'Dashboard',
-        path: '/patient/dashboard',
-      },
-      {
-        icon: <CalendarDays size={18} />,
-        name: 'Appointments',
-        path: '/patient/appointments',
-      },
-      {
-        icon: <ClipboardList size={18} />,
-        name: 'Medical Records',
-        path: '/patient/medical-records',
-      },
-      {
-        icon: <Pill size={18} />,
-        name: 'Prescriptions',
-        path: '/patient/prescriptions',
-      },
-      {
-        icon: <TestTube size={18} />,
-        name: 'Lab Reports',
-        path: '/patient/lab-reports',
-      },
-      {
-        icon: <Receipt size={18} />,
-        name: 'Billing',
-        path: '/patient/billing',
-      },
-      {
-        icon: <Bell size={18} />,
-        name: 'Notifications',
-        path: '/patient/notifications',
-      },
-      {
-        icon: <User size={18} />,
-        name: 'Profile',
-        path: '/patient/profile',
-      },
-      {
-        icon: <Settings size={18} />,
-        name: 'Settings',
-        path: '/patient/settings',
-      },
-    ],
-  };
-
-  const roleLabel = {
-    admin: 'Admin workspace',
-    doctor: 'Doctor workspace',
-    nurse: 'Nurse workspace',
-    receptionist: 'Front desk workspace',
-    patient: 'Patient workspace',
-  };
-
-  const role = 'patient';
+  // Local dev toggle: change this to preview a different role's nav when no
+  // roleProp is supplied. Layouts scoped to a single role (e.g.
+  // SuperAdminLayout) should always pass `role` explicitly instead of
+  // relying on this value.
+  const role = roleProp ?? 'patient';
   // const navigation = roleNavigation[role] || roleNavigation.admin;
-  const navigation = roleNavigation.receptionist;
+  const navigation = roleNavigation[role] ?? roleNavigation.admin;
+  const isGrouped = Array.isArray(navigation) && navigation.length > 0 && 'group' in navigation[0];
+
   const handleLogout = () => {
     navigate('/login');
   };
@@ -299,25 +66,26 @@ const SideBarLayout = () => {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu className="gap-1 px-2 py-4">
-            {navigation?.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <NavLink to={item.path}>
-                  {({ isActive }) => (
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      className="text-white/80 hover:bg-white/10 hover:text-white data-[active=true]:bg-black/15 data-[active=true]:text-white data-[active=true]:font-semibold cursor-pointer "
-                    >
-                      <span className="flex items-center gap-3">
-                        {item.icon}
-                        <span>{item.name}</span>
-                      </span>
-                    </SidebarMenuButton>
-                  )}
-                </NavLink>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          {isGrouped ? (
+            navigation.map((section) => (
+              <SidebarGroup key={section.group}>
+                <SidebarGroupLabel className="text-white/50">{section.group}</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu className="gap-1">
+                    {section.items.map((item) => (
+                      <NavItem key={item.name} item={item} />
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            ))
+          ) : (
+            <SidebarMenu className="gap-1 px-2 py-4">
+              {navigation?.map((item) => (
+                <NavItem key={item.name} item={item} />
+              ))}
+            </SidebarMenu>
+          )}
         </SidebarContent>
         <SidebarFooter className="border-t border-white/10">
           <SidebarMenu>
