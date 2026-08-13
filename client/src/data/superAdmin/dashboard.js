@@ -1,4 +1,4 @@
-import { getHospitals, hospitalStatusOptions } from './hospitals';
+import { getHospitals } from './hospitals';
 import { users } from './users';
 import { transactions, getBillingStats } from './billing';
 import { activityLogs } from './activityLogs';

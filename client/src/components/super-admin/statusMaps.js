@@ -59,6 +59,13 @@ export const notificationStatusMap = {
   Draft: 'border-transparent bg-slate-200 text-slate-600',
 };
 
+export const notificationTypeMap = {
+  Announcement: 'border-transparent bg-blue-100 text-blue-600',
+  Maintenance: 'border-transparent bg-amber-100 text-amber-600',
+  'Feature Update': 'border-transparent bg-violet-100 text-violet-600',
+  Billing: 'border-transparent bg-orange-100 text-orange-600',
+};
+
 export const systemHealthMap = {
   Operational: 'border-transparent bg-emerald-100 text-emerald-600',
   Warning: 'border-transparent bg-amber-100 text-amber-600',

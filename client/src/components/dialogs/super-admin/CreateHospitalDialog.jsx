@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { hospitalStatusOptions } from '@/data/superAdmin/hospitals';
 import { plans } from '@/data/superAdmin/subscriptionPlans';
 
-function CreateHospitalForm({ onOpenChange, onSave, isSubmitting }) {
+function CreateHospitalForm({ onSave, isSubmitting }) {
   const [form, setForm] = useState({
     name: '',
     code: '',
@@ -190,7 +190,7 @@ export function CreateHospitalDialog({ open, onOpenChange, onSave, isSubmitting 
           <DialogDescription>Register a new hospital on the platform.</DialogDescription>
         </DialogHeader>
 
-        <CreateHospitalForm key={open ? 'open' : 'closed'} onOpenChange={onOpenChange} onSave={handleSave} isSubmitting={isSubmitting} />
+        <CreateHospitalForm key={open ? 'open' : 'closed'} onSave={handleSave} isSubmitting={isSubmitting} />
       </DialogContent>
     </Dialog>
   );

@@ -24,17 +24,17 @@ const Billing = () => {
   const [activeTransaction, setActiveTransaction] = useState(null);
   const [openDialog, setOpenDialog] = useState(null);
 
-  const transactions = data?.transactions ?? [];
   const stats = data?.stats;
 
   const filteredTransactions = useMemo(() => {
+    const transactions = data?.transactions ?? [];
     return transactions.filter((t) => {
       const matchesHospital = hospitalId === 'all' || t.hospitalId === hospitalId;
       const matchesStatus = status === 'all' || t.status === status;
       const matchesMethod = method === 'all' || t.method === method;
       return matchesHospital && matchesStatus && matchesMethod;
     });
-  }, [transactions, hospitalId, status, method]);
+  }, [data, hospitalId, status, method]);
 
   const handleClearFilters = () => {
     setHospitalId('all');
