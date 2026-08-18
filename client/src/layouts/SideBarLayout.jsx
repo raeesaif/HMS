@@ -42,7 +42,7 @@ const SideBarLayout = ({ role: roleProp } = {}) => {
   // roleProp is supplied. Layouts scoped to a single role (e.g.
   // SuperAdminLayout) should always pass `role` explicitly instead of
   // relying on this value.
-  const role = roleProp ?? 'patient';
+  const role = roleProp ?? 'admin';
   // const navigation = roleNavigation[role] || roleNavigation.admin;
   const navigation = roleNavigation[role] ?? roleNavigation.admin;
   const isGrouped = Array.isArray(navigation) && navigation.length > 0 && 'group' in navigation[0];
