@@ -1,7 +1,5 @@
-import { type Express } from 'express';
+import authRouter from '@src/routes/authRoute';
 
-const routes = (app: Express): void => {
-  // routes will be registered here
+module.exports = (app: any) => {
+  app.use('/api/v1/auth', authRouter);
 };
-
-export = routes;
