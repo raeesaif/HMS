@@ -28,6 +28,8 @@ const registerUser = async (userData: RegisterUserData) => {
   const verificationToken = generateRandomString(32);
 
   const user = await UserModel.create({
+
+    
     ...userData,
     email: userData.email.toLowerCase(),
     password: hashedPassword,
@@ -60,4 +62,20 @@ const registerUser = async (userData: RegisterUserData) => {
   };
 };
 
-export { registerUser };
+const login = async (email: string, password: string) => {
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    throw new Error('Invalid email or password');
+  }
+
+  const isMatch = await user.comparePassword(password);
+
+  if (!isMatch) {
+    throw new Error('Invalid email or password');
+  }
+
+  return user;
+};
+
+export { registerUser, login };
