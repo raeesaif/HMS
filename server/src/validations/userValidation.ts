@@ -20,14 +20,12 @@ const userSchema = z
       .min(6, 'Password must be at least 6 characters')
       .optional(),
 
-    role: z.enum([
-      'superadmin',
-      'admin',
-      'doctor',
-      'nurse',
-      'receptionist',
-      'patient',
-    ]),
+    // 'admin' and 'superadmin' are deliberately excluded here — this schema
+    // backs the public, unauthenticated /auth/register endpoint, so allowing
+    // privileged roles here would let anyone self-assign platform admin
+    // access. Those accounts must be provisioned separately by an already
+    // authenticated superadmin.
+    role: z.enum(['doctor', 'nurse', 'receptionist', 'patient']),
 
     phone: z
       .string()

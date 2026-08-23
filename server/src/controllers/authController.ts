@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { registerUser } from '@src/services/authService';
+import { registerUser, loginService } from '@src/services/authService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
 
@@ -10,4 +10,12 @@ const register = catchAsync(
   }
 );
 
-export { register };
+const login = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const result = await loginService(req.body);
+    apiResponse.success(res, result, 'Login successful', 200);
+  }
+);
+
+
+export { register ,login};

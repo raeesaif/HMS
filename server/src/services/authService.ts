@@ -10,6 +10,7 @@ import {
   generateRandomString,
   generateStaffId,
 } from '@src/utils/helper';
+import { loginAccessToken, loginRefreshToken } from '@src/utils/jwt';
 
 import sendEmail from '@src/utils/sendEmail';
 import AppError from '@src/utils/appError';
@@ -179,22 +180,47 @@ const registerUser = async (userData: RegisterUserData) => {
   };
 };
 
-const login = async (email: string, password: string) => {
+const loginService = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
   const user = await UserModel.findOne({
     email: email.toLowerCase(),
   }).select('+password');
 
   if (!user) {
-    throw new Error('Invalid email or password');
+    throw new AppError(401, 'Invalid email or password');
   }
 
   const isMatch = await comparePassword(password, user.password);
 
   if (!isMatch) {
-    throw new Error('Invalid email or password');
+    throw new AppError(401, 'Invalid email or password');
   }
 
-  return user;
+  const token = loginAccessToken({ id: user._id, role: user.role });
+  const refreshToken = loginRefreshToken({ id: user._id });
+
+  return {
+    token,
+    refreshToken,
+    user: {
+      id: user._id,
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+      department: user.department,
+      specialty: user.specialty,
+      isFirstLogin: user.isFirstLogin,
+      isActive: user.isActive,
+    },
+  };
 };
 
-export { registerUser, login };
+export { registerUser, loginService };
