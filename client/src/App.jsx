@@ -54,6 +54,8 @@ import PatientSettings from './pages/PatientDashboard/Settings';
 import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 import SuperAdminDashboard from './pages/SuperAdminDashboard/Dashboard';
 import SuperAdminHospitals from './pages/SuperAdminDashboard/Hospitals';
+import SuperAdminDepartments from './pages/SuperAdminDashboard/Departments';
+import SuperAdminSpecialties from './pages/SuperAdminDashboard/Specialties';
 import SuperAdminUsers from './pages/SuperAdminDashboard/Users';
 import SuperAdminSubscriptions from './pages/SuperAdminDashboard/Subscriptions';
 import SuperAdminFeatures from './pages/SuperAdminDashboard/Features';
@@ -132,6 +134,8 @@ const App = () => {
             {/* Super Admin */}
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/super-admin/hospitals" element={<SuperAdminHospitals />} />
+            <Route path="/super-admin/departments" element={<SuperAdminDepartments />} />
+            <Route path="/super-admin/specialties" element={<SuperAdminSpecialties />} />
             <Route path="/super-admin/users" element={<SuperAdminUsers />} />
             <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
             <Route path="/super-admin/features" element={<SuperAdminFeatures />} />

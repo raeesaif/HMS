@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import 'colors';
 import app from './app';
 import '@src/config/db';

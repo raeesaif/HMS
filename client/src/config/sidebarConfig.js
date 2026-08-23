@@ -30,6 +30,7 @@ import {
   TestTube,
   UsersRound,
   Building2,
+  Layers,
   CreditCard,
   Puzzle,
   ScrollText,
@@ -103,6 +104,13 @@ export const roleNavigation = {
         { icon: LayoutDashboard, name: 'Dashboard', path: '/super-admin/dashboard' },
         { icon: Building2, name: 'Hospitals', path: '/super-admin/hospitals' },
         { icon: Users, name: 'Users', path: '/super-admin/users' },
+      ],
+    },
+    {
+      group: 'CATALOG',
+      items: [
+        { icon: Layers, name: 'Department', path: '/super-admin/departments' },
+        { icon: Stethoscope, name: 'Specialty', path: '/super-admin/specialties' },
       ],
     },
     {

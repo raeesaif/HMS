@@ -5,6 +5,7 @@ import express, {
   type NextFunction,
 } from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import 'colors';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -38,6 +39,14 @@ app.use((req, _res, next) => {
 });
 
 app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 
