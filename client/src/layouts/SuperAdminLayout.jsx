@@ -15,23 +15,40 @@ import {
 } from '@/components/ui/dropdown-menu';
 import SideBarLayout from './SideBarLayout';
 import { roleNavigation, flattenNavigation } from '@/config/sidebarConfig';
+import { useGetMe } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authstore';
 
 const pageTitles = flattenNavigation(roleNavigation.superAdmin);
 
-const superAdminProfile = {
-  name: 'Admin User',
-  email: 'admin@medicore.platform',
-  avatarInitials: 'AU',
+const FALLBACK_PROFILE = {
+  name: 'Super Admin',
+  email: '',
+  avatarInitials: 'SA',
 };
 
 export function SuperAdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const storedUser = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const { data: me } = useGetMe();
+
+  const currentUser = me ?? storedUser;
+  const profile = currentUser
+    ? {
+        name: `${currentUser.firstName} ${currentUser.lastName}`,
+        email: currentUser.email,
+        avatarInitials: `${currentUser.firstName?.[0] ?? ''}${currentUser.lastName?.[0] ?? ''}`.toUpperCase(),
+      }
+    : FALLBACK_PROFILE;
 
   const pageTitle = pageTitles[location.pathname] ?? 'Super Admin';
 
-  const handleLogout = () => navigate('/login');
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <SidebarProvider>
@@ -76,11 +93,11 @@ export function SuperAdminLayout() {
                   }
                 >
                   <Avatar size="sm">
-                    <AvatarFallback className="bg-sky-100 text-sky-600">{superAdminProfile.avatarInitials}</AvatarFallback>
+                    <AvatarFallback className="bg-sky-100 text-sky-600">{profile.avatarInitials}</AvatarFallback>
                   </Avatar>
                   <div className="hidden text-left sm:block">
-                    <p className="text-xs font-medium text-foreground">{superAdminProfile.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{superAdminProfile.email}</p>
+                    <p className="text-xs font-medium text-foreground">{profile.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{profile.email}</p>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">

@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { registerUser, loginService } from '@src/services/authService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
+import sanitizeUser from '@src/utils/sanitizeUser';
+import AppError from '@src/utils/appError';
 
 const register = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
@@ -17,5 +19,14 @@ const login = catchAsync(
   }
 );
 
+const meController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    if (!req.user) {
+      throw new AppError(401, 'You are not logged in! Please log in to get access.');
+    }
+    apiResponse.success(res, sanitizeUser(req.user), 'User fetched successfully', 200);
+  }
+);
 
-export { register ,login};
+
+export { register ,login,meController};

@@ -14,6 +14,7 @@ import {
   SidebarGroupContent,
 } from '@/components/ui/sidebar';
 import { roleNavigation, roleLabel } from '@/config/sidebarConfig';
+import { useAuthStore } from '@/store/authstore';
 
 function NavItem({ item }) {
   return (
@@ -37,6 +38,7 @@ function NavItem({ item }) {
 
 const SideBarLayout = ({ role: roleProp } = {}) => {
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
 
   // Local dev toggle: change this to preview a different role's nav when no
   // roleProp is supplied. Layouts scoped to a single role (e.g.
@@ -48,6 +50,7 @@ const SideBarLayout = ({ role: roleProp } = {}) => {
   const isGrouped = Array.isArray(navigation) && navigation.length > 0 && 'group' in navigation[0];
 
   const handleLogout = () => {
+    logout();
     navigate('/login');
   };
 

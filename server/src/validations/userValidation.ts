@@ -59,8 +59,32 @@ const userSchema = z
     patientStatus: z
       .enum(['stable', 'observation', 'critical', 'discharged'])
       .optional(),
+
+    age: z
+      .number()
+      .int()
+      .min(0, 'Age cannot be negative')
+      .max(150, 'Age cannot exceed 150')
+      .optional(),
+
+    doctor: z.string().optional(),
+
+    admissionDate: z.coerce.date().optional(),
+
+    startDate: z.coerce.date().optional(),
+
+    endDate: z.coerce.date().optional(),
   })
   .superRefine((data, ctx) => {
+    // Phone is required for every self-registerable role.
+    if (!data.phone) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['phone'],
+        message: 'Phone number is required',
+      });
+    }
+
     if (data.role === 'doctor') {
       if (!data.department) {
         ctx.addIssue({
@@ -101,6 +125,22 @@ const userSchema = z
           message: 'Experience is required for doctors',
         });
       }
+
+      if (!data.startDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['startDate'],
+          message: 'Start date is required for doctors',
+        });
+      }
+
+      if (!data.endDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['endDate'],
+          message: 'End date is required for doctors',
+        });
+      }
     }
 
     if (data.role === 'nurse') {
@@ -119,6 +159,22 @@ const userSchema = z
           message: 'License number is required for nurses',
         });
       }
+
+      if (!data.startDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['startDate'],
+          message: 'Start date is required for nurses',
+        });
+      }
+
+      if (!data.endDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['endDate'],
+          message: 'End date is required for nurses',
+        });
+      }
     }
 
     if (data.role === 'receptionist') {
@@ -127,6 +183,22 @@ const userSchema = z
           code: 'custom',
           path: ['department'],
           message: 'Department is required for receptionists',
+        });
+      }
+
+      if (!data.startDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['startDate'],
+          message: 'Start date is required for receptionists',
+        });
+      }
+
+      if (!data.endDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['endDate'],
+          message: 'End date is required for receptionists',
         });
       }
     }
@@ -153,6 +225,30 @@ const userSchema = z
           code: 'custom',
           path: ['patientStatus'],
           message: 'Patient status is required',
+        });
+      }
+
+      if (!data.doctor) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['doctor'],
+          message: 'Doctor is required for patients',
+        });
+      }
+
+      if (!data.admissionDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['admissionDate'],
+          message: 'Admission date is required for patients',
+        });
+      }
+
+      if (data.age === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['age'],
+          message: 'Age is required for patients',
         });
       }
     }

@@ -11,14 +11,15 @@ import {
   updateSpecialtySchema,
 } from '@src/validations/specialtyValidation';
 import validateSchemaPayload from '@src/utils/validateSchemaPayload';
-import { authMiddleware, restrictTo } from '@src/middleware/authMiddleware';
+import { authMiddleware } from '@src/middleware/authMiddleware';
+import { restrictMiddleware } from '@src/middleware/restrictMiddleware';
 
 const specialtyRouter = Router();
 
 specialtyRouter.get('/', getAllSpecialties);
 specialtyRouter.get('/:id', getSpecialty);
 
-specialtyRouter.use(authMiddleware, restrictTo('admin', 'superadmin'));
+specialtyRouter.use(authMiddleware, restrictMiddleware('admin', 'superadmin'));
 
 specialtyRouter.post(
   '/',

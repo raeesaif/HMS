@@ -127,6 +127,18 @@ const UserSchema = new Schema(
     },
 
     // =========================
+    // Employment Period (staff only)
+    // =========================
+
+    startDate: {
+      type: Date,
+    },
+
+    endDate: {
+      type: Date,
+    },
+
+    // =========================
     // Patient Information
     // =========================
 
@@ -150,6 +162,15 @@ const UserSchema = new Schema(
       type: Number,
       min: [0, 'Age cannot be negative'],
       max: [150, 'Age cannot exceed 150'],
+    },
+
+    doctor: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+
+    admissionDate: {
+      type: Date,
     },
 
     // =========================

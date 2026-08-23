@@ -4,12 +4,32 @@ import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Outlet } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuthStore } from '@/store/authstore';
+import { useGetMe } from '@/hooks/useAuth';
+
+const FALLBACK_PROFILE = {
+  name: 'Guest User',
+  email: 'guest@gmail.com',
+  avatarInitials: 'G',
+};
 
 export function MainLayout() {
+  const storedUser = useAuthStore((state) => state.user);
+  const { data: me } = useGetMe();
+
+  const currentUser = me ?? storedUser;
+  const profile = currentUser
+    ? {
+        name: `${currentUser.firstName} ${currentUser.lastName}`,
+        email: currentUser.email,
+        avatarInitials: `${currentUser.firstName?.[0] ?? ''}${currentUser.lastName?.[0] ?? ''}`.toUpperCase(),
+      }
+    : FALLBACK_PROFILE;
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <SideBarLayout />
+        <SideBarLayout role={currentUser?.role} />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-background/95 backdrop-blur px-4 sm:px-6">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
@@ -28,16 +48,16 @@ export function MainLayout() {
                 <div>
                   <Avatar>
                     <AvatarFallback className="bg-stone-500 text-white">
-                      G
+                      {profile.avatarInitials}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="hidden sm:block">
                   <p className="text-xs font-medium text-foreground">
-                    Guest User
+                    {profile.name}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
-                    guest@gmail.com
+                    {profile.email}
                   </p>
                 </div>
               </div>

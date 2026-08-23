@@ -14,6 +14,7 @@ import { loginAccessToken, loginRefreshToken } from '@src/utils/jwt';
 
 import sendEmail from '@src/utils/sendEmail';
 import AppError from '@src/utils/appError';
+import sanitizeUser from '@src/utils/sanitizeUser';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const welcomeEmailTemplate = require('@src/emails/WelcomeEmail').default;
 
@@ -40,6 +41,13 @@ type RegisterUserData = {
   gender?: 'male' | 'female';
 
   patientStatus?: 'stable' | 'observation' | 'critical' | 'discharged';
+
+  age?: number;
+  doctor?: string;
+  admissionDate?: Date;
+
+  startDate?: Date;
+  endDate?: Date;
 };
 
 const escapeRegExp = (value: string): string =>
@@ -62,6 +70,22 @@ const resolveReference = async (
   }
 
   return String(document._id);
+};
+
+const resolveDoctorId = async (value?: string): Promise<string | undefined> => {
+  if (!value) return undefined;
+  if (Types.ObjectId.isValid(value)) return value;
+
+  const doctor = await UserModel.findOne({
+    role: Role.Doctor,
+    $or: [{ userId: value }, { email: value.toLowerCase() }],
+  });
+
+  if (!doctor) {
+    throw new AppError(400, `Doctor "${value}" not found`);
+  }
+
+  return String(doctor._id);
 };
 
 const registerUser = async (userData: RegisterUserData) => {
@@ -88,6 +112,8 @@ const registerUser = async (userData: RegisterUserData) => {
     'Specialty',
     userData.specialty
   );
+
+  const doctorId = await resolveDoctorId(userData.doctor);
 
   // =================================
   // Generate password
@@ -122,6 +148,7 @@ const registerUser = async (userData: RegisterUserData) => {
 
     department: departmentId,
     specialty: specialtyId,
+    doctor: doctorId,
 
     password: hashedPassword,
 
@@ -164,19 +191,7 @@ const registerUser = async (userData: RegisterUserData) => {
   // =================================
 
   return {
-    user: {
-      id: user._id,
-      userId: user.userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      department: user.department,
-      specialty: user.specialty,
-      isFirstLogin: user.isFirstLogin,
-      isActive: user.isActive,
-    },
+    user: sanitizeUser(user),
   };
 };
 
@@ -207,20 +222,10 @@ const loginService = async ({
   return {
     token,
     refreshToken,
-    user: {
-      id: user._id,
-      userId: user.userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      department: user.department,
-      specialty: user.specialty,
-      isFirstLogin: user.isFirstLogin,
-      isActive: user.isActive,
-    },
+    user: sanitizeUser(user),
   };
 };
+
+
 
 export { registerUser, loginService };

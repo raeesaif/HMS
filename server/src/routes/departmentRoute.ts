@@ -11,14 +11,15 @@ import {
   updateDepartmentSchema,
 } from '@src/validations/departmentValidation';
 import validateSchemaPayload from '@src/utils/validateSchemaPayload';
-import { authMiddleware, restrictTo } from '@src/middleware/authMiddleware';
+import { authMiddleware } from '@src/middleware/authMiddleware';
+import { restrictMiddleware } from '@src/middleware/restrictMiddleware';
 
 const departmentRouter = Router();
 
 departmentRouter.get('/', getAllDepartments);
 departmentRouter.get('/:id', getDepartment);
 
-departmentRouter.use(authMiddleware, restrictTo('admin', 'superadmin'));
+departmentRouter.use(authMiddleware, restrictMiddleware('admin', 'superadmin'));
 
 departmentRouter.post(
   '/',

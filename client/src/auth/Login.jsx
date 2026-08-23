@@ -8,11 +8,25 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { EyeOff, Eye } from 'lucide-react';
+import { toast } from 'sonner';
+import { useLogin } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authstore';
 const DEFAULT_VALUE = { email: '', password: '' };
+
+const ROLE_DASHBOARD_PATH = {
+  superadmin: '/super-admin/dashboard',
+  admin: '/admin/dashboard',
+  doctor: '/doctor/dashboard',
+  nurse: '/nurse/dashboard',
+  receptionist: '/reception/dashboard',
+  patient: '/patient/dashboard',
+};
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const login = useLogin();
 
   const {
     register,
@@ -25,8 +39,17 @@ const Login = () => {
   });
 
   const Submit = (data) => {
-    console.log(data);
-    reset();
+    login.mutate(data, {
+      onSuccess: ({ accessToken, refreshToken, user }) => {
+        setAuth({ user, accessToken, refreshToken });
+        toast.success(`Welcome back, ${user.firstName}!`);
+        reset();
+        navigate(ROLE_DASHBOARD_PATH[user.role] ?? '/');
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message ?? 'Invalid email or password');
+      },
+    });
   };
 
   return (
@@ -86,8 +109,8 @@ const Login = () => {
                 </p>
               )}
             </div>
-            <Button type="submit" className="w-full cursor-pointer">
-              Login
+            <Button type="submit" className="w-full cursor-pointer" disabled={login.isPending}>
+              {login.isPending ? 'Signing in...' : 'Login'}
             </Button>
           </Field>
         </form>
