@@ -1,5 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { registerUser, loginService } from '@src/services/authService';
+import {
+  registerUser,
+  loginService,
+  updateDutyStatus,
+  updateAvailabilityStatus,
+} from '@src/services/authService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
 import sanitizeUser from '@src/utils/sanitizeUser';
@@ -28,5 +33,33 @@ const meController = catchAsync(
   }
 );
 
+const updateDutyStatusController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    if (!req.user) {
+      throw new AppError(401, 'You are not logged in! Please log in to get access.');
+    }
+    const user = await updateDutyStatus(String(req.user._id), req.body.dutyStatus);
+    apiResponse.success(res, user, 'Duty status updated successfully', 200);
+  }
+);
 
-export { register ,login,meController};
+const updateAvailabilityStatusController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    if (!req.user) {
+      throw new AppError(401, 'You are not logged in! Please log in to get access.');
+    }
+    const user = await updateAvailabilityStatus(
+      String(req.user._id),
+      req.body.availabilityStatus
+    );
+    apiResponse.success(res, user, 'Availability status updated successfully', 200);
+  }
+);
+
+export {
+  register,
+  login,
+  meController,
+  updateDutyStatusController,
+  updateAvailabilityStatusController,
+};

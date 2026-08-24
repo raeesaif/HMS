@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select-field';
 import { PatientSchema } from '@/schema/PatientSchema';
-import { DEPARTMENTS, GENDERS, PATIENT_STATUSES } from '@/constants/patient';
+import { DEPARTMENTS, GENDERS, PATIENT_STATUSES, BLOOD_GROUPS } from '@/constants/patient';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -28,6 +28,7 @@ const getDefaultValues = () => ({
   gender: '',
   phone: '',
   department: '',
+  bloodGroup: '',
   doctor: '',
   status: 'Stable',
   admittedDate: todayISO(),
@@ -116,6 +117,17 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
             {DEPARTMENTS.map((department) => (
               <option key={department} value={department}>
                 {department}
+              </option>
+            ))}
+          </SelectField>
+
+          <SelectField label="Blood Group" error={errors.bloodGroup} {...register('bloodGroup')}>
+            <option value="" disabled>
+              Select blood group
+            </option>
+            {BLOOD_GROUPS.map((bloodGroup) => (
+              <option key={bloodGroup} value={bloodGroup}>
+                {bloodGroup}
               </option>
             ))}
           </SelectField>

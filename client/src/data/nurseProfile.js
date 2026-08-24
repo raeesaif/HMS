@@ -5,6 +5,7 @@ export const nurseProfileData = {
   department: 'General Ward',
   employeeId: 'RN-2031',
   employmentStatus: 'Active',
+  dutyStatus: 'Available',
   employmentType: 'Full-time',
   shift: 'Day Shift (07:00 - 15:00)',
   joiningDate: '15 Jan 2022',

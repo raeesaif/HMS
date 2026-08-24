@@ -16,6 +16,7 @@ export const receptionistProfile = {
   dateOfBirth: '21 Feb 1994',
   address: 'Flat 14, Block C, Askari Heights, Islamabad',
   profileImage: null,
+  dutyStatus: 'Available',
   employmentType: 'Full-Time',
   joiningDate: '11 Jan 2021',
   employmentStatus: 'Active',

@@ -121,21 +121,25 @@ const UserSchema = new Schema(
       trim: true,
     },
 
-    isOnDuty: {
-      type: Boolean,
-      default: false,
+    // Whether the staff member is clocked in at all.
+    dutyStatus: {
+      type: String,
+      enum: {
+        values: ['On Duty', 'Off Duty'],
+        message: 'Duty status must be On Duty or Off Duty',
+      },
+      default: 'Off Duty',
     },
 
-    // =========================
-    // Employment Period (staff only)
-    // =========================
-
-    startDate: {
-      type: Date,
-    },
-
-    endDate: {
-      type: Date,
+    // Real-time task availability while on duty. Kept separate from
+    // dutyStatus on purpose — "Busy" describes what an on-duty person is
+    // doing right now, not whether they're clocked in.
+    availabilityStatus: {
+      type: String,
+      enum: {
+        values: ['Available', 'Break', 'Busy'],
+        message: 'Availability status must be Available, Break, or Busy',
+      },
     },
 
     // =========================
@@ -162,6 +166,14 @@ const UserSchema = new Schema(
       type: Number,
       min: [0, 'Age cannot be negative'],
       max: [150, 'Age cannot exceed 150'],
+    },
+
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: 'Blood group must be one of A+, A-, B+, B-, AB+, AB-, O+, O-',
+      },
     },
 
     doctor: {

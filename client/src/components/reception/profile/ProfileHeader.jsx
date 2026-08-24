@@ -3,8 +3,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DutyStatusControl } from '@/shared/DutyStatusControl';
 
-export function ProfileHeader({ profile, onEditProfile, onUploadPhoto }) {
+export function ProfileHeader({ profile, onEditProfile, onUploadPhoto, onDutyStatusChange }) {
   return (
     <Card className="rounded-xl border-border shadow-sm">
       <CardContent className="flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -29,6 +30,9 @@ export function ProfileHeader({ profile, onEditProfile, onUploadPhoto }) {
             <p className="text-xs text-slate-500">
               {profile.department} · {profile.employeeId}
             </p>
+            <div className="mt-2 flex justify-center sm:justify-start">
+              <DutyStatusControl status={profile.dutyStatus} onChange={onDutyStatusChange} />
+            </div>
           </div>
         </div>
 

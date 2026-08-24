@@ -1,9 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { DutyStatusControl } from '@/shared/DutyStatusControl';
 import { ProfileAvatar } from './ProfileAvatar';
 import { ProfileInformationItem } from './ProfileInformationItem';
 
-export function ProfileHeader({ profile, onEditPhoto }) {
+export function ProfileHeader({ profile, onEditPhoto, onDutyStatusChange }) {
   const fullName = `${profile.firstName} ${profile.lastName}`;
 
   return (
@@ -21,6 +22,10 @@ export function ProfileHeader({ profile, onEditPhoto }) {
           <p className="mt-0.5 text-sm text-slate-500">
             {profile.role} · {profile.department}
           </p>
+
+          <div className="mt-2">
+            <DutyStatusControl status={profile.dutyStatus} onChange={onDutyStatusChange} />
+          </div>
 
           <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4">
             <ProfileInformationItem label="Employee ID" value={profile.employeeId} />

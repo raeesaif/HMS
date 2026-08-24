@@ -52,7 +52,9 @@ const userSchema = z
 
     shiftEnd: z.string().optional(),
 
-    isOnDuty: z.boolean().optional(),
+    dutyStatus: z.enum(['On Duty', 'Off Duty']).optional(),
+
+    availabilityStatus: z.enum(['Available', 'Break', 'Busy']).optional(),
 
     gender: z.enum(['male', 'female']).optional(),
 
@@ -71,9 +73,7 @@ const userSchema = z
 
     admissionDate: z.coerce.date().optional(),
 
-    startDate: z.coerce.date().optional(),
-
-    endDate: z.coerce.date().optional(),
+    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']).optional(),
   })
   .superRefine((data, ctx) => {
     // Phone is required for every self-registerable role.
@@ -126,19 +126,19 @@ const userSchema = z
         });
       }
 
-      if (!data.startDate) {
+      if (!data.shiftStart) {
         ctx.addIssue({
           code: 'custom',
-          path: ['startDate'],
-          message: 'Start date is required for doctors',
+          path: ['shiftStart'],
+          message: 'Shift start time is required for doctors',
         });
       }
 
-      if (!data.endDate) {
+      if (!data.shiftEnd) {
         ctx.addIssue({
           code: 'custom',
-          path: ['endDate'],
-          message: 'End date is required for doctors',
+          path: ['shiftEnd'],
+          message: 'Shift end time is required for doctors',
         });
       }
     }
@@ -160,19 +160,19 @@ const userSchema = z
         });
       }
 
-      if (!data.startDate) {
+      if (!data.shiftStart) {
         ctx.addIssue({
           code: 'custom',
-          path: ['startDate'],
-          message: 'Start date is required for nurses',
+          path: ['shiftStart'],
+          message: 'Shift start time is required for nurses',
         });
       }
 
-      if (!data.endDate) {
+      if (!data.shiftEnd) {
         ctx.addIssue({
           code: 'custom',
-          path: ['endDate'],
-          message: 'End date is required for nurses',
+          path: ['shiftEnd'],
+          message: 'Shift end time is required for nurses',
         });
       }
     }
@@ -186,19 +186,19 @@ const userSchema = z
         });
       }
 
-      if (!data.startDate) {
+      if (!data.shiftStart) {
         ctx.addIssue({
           code: 'custom',
-          path: ['startDate'],
-          message: 'Start date is required for receptionists',
+          path: ['shiftStart'],
+          message: 'Shift start time is required for receptionists',
         });
       }
 
-      if (!data.endDate) {
+      if (!data.shiftEnd) {
         ctx.addIssue({
           code: 'custom',
-          path: ['endDate'],
-          message: 'End date is required for receptionists',
+          path: ['shiftEnd'],
+          message: 'Shift end time is required for receptionists',
         });
       }
     }
@@ -251,6 +251,14 @@ const userSchema = z
           message: 'Age is required for patients',
         });
       }
+
+      if (!data.bloodGroup) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['bloodGroup'],
+          message: 'Blood group is required for patients',
+        });
+      }
     }
   });
 
@@ -259,4 +267,12 @@ export const loginSchema = z.object({
   email: z.string().trim().email('Please enter a valid email').toLowerCase(),
 
   password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+export const updateDutyStatusSchema = z.object({
+  dutyStatus: z.enum(['On Duty', 'Off Duty']),
+});
+
+export const updateAvailabilityStatusSchema = z.object({
+  availabilityStatus: z.enum(['Available', 'Break', 'Busy']),
 });

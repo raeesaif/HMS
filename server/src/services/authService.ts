@@ -36,7 +36,8 @@ type RegisterUserData = {
 
   shiftStart?: string;
   shiftEnd?: string;
-  isOnDuty?: boolean;
+  dutyStatus?: 'On Duty' | 'Off Duty';
+  availabilityStatus?: 'Available' | 'Break' | 'Busy';
 
   gender?: 'male' | 'female';
 
@@ -45,9 +46,8 @@ type RegisterUserData = {
   age?: number;
   doctor?: string;
   admissionDate?: Date;
+  bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
-  startDate?: Date;
-  endDate?: Date;
 };
 
 const escapeRegExp = (value: string): string =>
@@ -226,6 +226,58 @@ const loginService = async ({
   };
 };
 
+const updateDutyStatus = async (
+  userId: string,
+  dutyStatus: 'On Duty' | 'Off Duty'
+) => {
+  const user = await UserModel.findById(userId);
 
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
 
-export { registerUser, loginService };
+  user.dutyStatus = dutyStatus;
+
+  if (dutyStatus === 'Off Duty') {
+    // Going off duty clears availability — "Busy"/"Break" only make sense
+    // for someone who's actually clocked in.
+    user.availabilityStatus = undefined;
+  } else if (!user.availabilityStatus) {
+    // Coming on duty with no availability set yet defaults to Available.
+    user.availabilityStatus = 'Available';
+  }
+
+  await user.save();
+
+  return sanitizeUser(user);
+};
+
+const updateAvailabilityStatus = async (
+  userId: string,
+  availabilityStatus: 'Available' | 'Break' | 'Busy'
+) => {
+  const user = await UserModel.findById(userId);
+
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  if (user.dutyStatus !== 'On Duty') {
+    throw new AppError(
+      400,
+      'Cannot set availability while off duty. Go on duty first.'
+    );
+  }
+
+  user.availabilityStatus = availabilityStatus;
+  await user.save();
+
+  return sanitizeUser(user);
+};
+
+export {
+  registerUser,
+  loginService,
+  updateDutyStatus,
+  updateAvailabilityStatus,
+};

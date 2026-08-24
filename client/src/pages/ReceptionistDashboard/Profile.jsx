@@ -58,6 +58,11 @@ const Profile = () => {
     logActivity('Profile Picture Updated');
   };
 
+  const handleDutyStatusChange = (dutyStatus) => {
+    setProfile((prev) => ({ ...prev, dutyStatus }));
+    logActivity(`Duty Status Changed to ${dutyStatus}`);
+  };
+
   if (hasError) {
     return (
       <div className="mx-auto w-full max-w-[1600px]">
@@ -85,7 +90,12 @@ const Profile = () => {
       {isLoading ? (
         <CardGridSkeleton count={1} />
       ) : (
-        <ProfileHeader profile={profile} onEditProfile={() => setEditOpen(true)} onUploadPhoto={() => setAvatarOpen(true)} />
+        <ProfileHeader
+          profile={profile}
+          onEditProfile={() => setEditOpen(true)}
+          onUploadPhoto={() => setAvatarOpen(true)}
+          onDutyStatusChange={handleDutyStatusChange}
+        />
       )}
 
       <Alert variant="warning">

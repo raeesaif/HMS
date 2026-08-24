@@ -49,6 +49,7 @@ const AdminPatients = () => {
             : values.gender,
       phone: values.phone,
       department: values.department,
+      bloodGroup: values.bloodGroup,
       doctor: values.doctor,
       admitted: formatAdmittedDate(values.admittedDate),
       status: values.status,

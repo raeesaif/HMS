@@ -10,6 +10,7 @@ export const PatientSchema = zod.object({
   gender: zod.string().min(1, 'Select a gender'),
   phone: zod.string().min(1, 'Phone number is required'),
   department: zod.string().min(1, 'Select a department'),
+  bloodGroup: zod.string().min(1, 'Select a blood group'),
   doctor: zod.string().min(1, 'Doctor is required'),
   status: zod.string().min(1, 'Select a status'),
   admittedDate: zod.string().min(1, 'Admission date is required'),
