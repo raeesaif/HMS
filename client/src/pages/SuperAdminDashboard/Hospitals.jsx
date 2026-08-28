@@ -100,7 +100,7 @@ const Hospitals = () => {
   };
 
   const handleCreate = (payload) => {
-    createHospital.mutate(payload);
+    return createHospital.mutateAsync(payload);
   };
 
   const handleEdit = (hospitalId, payload) => {

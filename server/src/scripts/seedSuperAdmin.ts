@@ -1,5 +1,5 @@
 /**
- * One-time bootstrap script for creating the first superadmin/admin account.
+ * One-time bootstrap script for creating the first superadmin account.
  *
  * Not exposed over HTTP on purpose: the public /auth/register endpoint
  * deliberately cannot create admin/superadmin accounts (see
@@ -8,7 +8,7 @@
  * "create staff" endpoint (once login exists) can create the rest.
  *
  * Usage:
- *   npm run seed:admin -- --email=admin@hms.com --password=Secret123 --firstName=Super --lastName=Admin [--role=admin]
+ *   npm run seed:admin -- --email=admin@hms.com --password=Secret123 --firstName=Super --lastName=Admin
  */
 import 'dotenv/config';
 import mongoose from 'mongoose';
@@ -20,7 +20,6 @@ type Args = {
   password?: string;
   firstName?: string;
   lastName?: string;
-  role?: string;
 };
 
 const parseArgs = (argv: string[]): Args => {
@@ -41,11 +40,11 @@ async function main() {
   const email = args.email?.trim().toLowerCase();
   const firstName = args.firstName?.trim();
   const lastName = args.lastName?.trim();
-  const role = args.role === 'admin' ? Role.Admin : Role.SuperAdmin;
+  const role = Role.SuperAdmin;
 
   if (!email || !firstName || !lastName) {
     console.error(
-      'Usage: npm run seed:admin -- --email=you@example.com --password=Secret123 --firstName=First --lastName=Last [--role=admin]'
+      'Usage: npm run seed:admin -- --email=you@example.com --password=Secret123 --firstName=First --lastName=Last'
     );
     process.exit(1);
   }
@@ -76,7 +75,6 @@ async function main() {
     password: hashedPassword,
     role,
     userId,
-    isVerified: true,
     isFirstLogin: true,
     isActive: true,
   });

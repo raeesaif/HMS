@@ -1,5 +1,6 @@
 import { getHospitals, getHospitalById } from '@/data/superAdmin/hospitals';
 import { simulateRequest } from '@/services/apiClient';
+import { hospitalAPI } from '@/apis/hospitalApis';
 
 export function fetchHospitals() {
   return simulateRequest(getHospitals());
@@ -10,7 +11,7 @@ export function fetchHospitalById(hospitalId) {
 }
 
 export function createHospital(payload) {
-  return simulateRequest({ id: `HOSP-${Date.now()}`, status: 'Trial', ...payload });
+  return hospitalAPI.create(payload);
 }
 
 export function updateHospital(hospitalId, payload) {

@@ -11,10 +11,19 @@ const globalErrorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
 
   if (mongoError.code === 11000) {
     const duplicateField = Object.keys(mongoError.keyPattern ?? {})[0];
+
+    const duplicateFieldMessages: Record<string, string> = {
+      email: 'Email is already registered',
+      hospitalEmail: 'Hospital email is already registered',
+      hospitalCode: 'Hospital code is already registered',
+      hospitalPhone: 'Hospital phone number is already registered',
+      licenseNumber: 'License number is already registered',
+      userId: 'User ID is already registered',
+    };
+
     const message =
-      duplicateField === 'licenseNumber'
-        ? 'License number is already registered'
-        : 'Email is already registered';
+      duplicateFieldMessages[duplicateField] ??
+      `${duplicateField} is already registered`;
 
     sendResponse(res, 409, {
       status: 'fail',

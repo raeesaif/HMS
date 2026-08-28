@@ -17,7 +17,7 @@ const COMMON_FIELDS = [
 
 const ROLE_FIELDS: Record<Role, readonly string[]> = {
   [Role.SuperAdmin]: [],
-  [Role.Admin]: [],
+  [Role.Admin]: ['hospitalId'],
   [Role.Doctor]: [
     'department',
     'specialty',
@@ -28,6 +28,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
     'shiftEnd',
     'dutyStatus',
     'availabilityStatus',
+    'hospitalId',
   ],
   [Role.Nurse]: [
     'department',
@@ -36,6 +37,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
     'shiftEnd',
     'dutyStatus',
     'availabilityStatus',
+    'hospitalId',
   ],
   [Role.Receptionist]: [
     'department',
@@ -43,6 +45,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
     'shiftEnd',
     'dutyStatus',
     'availabilityStatus',
+    'hospitalId',
   ],
   [Role.Patient]: [
     'gender',
@@ -52,6 +55,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
     'age',
     'admissionDate',
     'bloodGroup',
+    'hospitalId',
   ],
 };
 

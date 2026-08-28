@@ -226,6 +226,11 @@ const UserSchema = new Schema(
       type: String,
       select: false,
     },
+    hospitalId:{
+      type:Schema.Types.ObjectId,
+       ref: "Hospital",
+      default:null
+    }
   },
   {
     timestamps: true,

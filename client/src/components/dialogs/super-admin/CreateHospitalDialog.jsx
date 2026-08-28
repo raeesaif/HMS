@@ -12,9 +12,6 @@ import {
 import { FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { hospitalStatusOptions } from '@/data/superAdmin/hospitals';
-import { plans } from '@/data/superAdmin/subscriptionPlans';
 
 function CreateHospitalForm({ onSave, isSubmitting }) {
   const [form, setForm] = useState({
@@ -22,21 +19,24 @@ function CreateHospitalForm({ onSave, isSubmitting }) {
     code: '',
     email: '',
     phone: '',
-    address: '',
+    addressLine1: '',
+    addressLine2: '',
     city: '',
+    state: '',
     country: '',
+    postalCode: '',
     adminFirstName: '',
     adminLastName: '',
     adminEmail: '',
-    plan: '',
-    trialDays: '14',
-    status: 'Trial',
+    adminPhone: '',
   });
   const [errors, setErrors] = useState({});
 
   const updateField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
   const handleSave = () => {
+    if (isSubmitting) return;
+
     const nextErrors = {};
     if (!form.name.trim()) nextErrors.name = 'Hospital name is required';
     if (!form.code.trim()) nextErrors.code = 'Hospital code is required';
@@ -47,59 +47,84 @@ function CreateHospitalForm({ onSave, isSubmitting }) {
     if (!form.adminFirstName.trim()) nextErrors.adminFirstName = 'Admin first name is required';
     if (!form.adminLastName.trim()) nextErrors.adminLastName = 'Admin last name is required';
     if (!/^\S+@\S+\.\S+$/.test(form.adminEmail.trim())) nextErrors.adminEmail = 'Enter a valid admin email address';
-    if (!form.plan) nextErrors.plan = 'Select a subscription plan';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     onSave({
-      ...form,
-      name: form.name.trim(),
-      code: form.code.trim().toUpperCase(),
-      email: form.email.trim(),
-      users: { admins: 1, doctors: 0, nurses: 0, receptionists: 0, patients: 0 },
-      registrationDate: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
-      lastActivity: '—',
+      hospitalName: form.name.trim(),
+      hospitalCode: form.code.trim().toUpperCase(),
+      hospitalEmail: form.email.trim(),
+      hospitalPhone: form.phone.trim(),
+      address: {
+        addressLine1: form.addressLine1.trim() || undefined,
+        addressLine2: form.addressLine2.trim() || undefined,
+        city: form.city.trim(),
+        state: form.state.trim() || undefined,
+        country: form.country.trim(),
+        postalCode: form.postalCode.trim() || undefined,
+      },
+      admin: {
+        firstName: form.adminFirstName.trim(),
+        lastName: form.adminLastName.trim(),
+        email: form.adminEmail.trim(),
+        phone: form.adminPhone.trim() || undefined,
+      },
     });
   };
 
   return (
     <>
       <div className="max-h-[65vh] space-y-4 overflow-y-auto pr-1">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1">
-            <FieldLabel>Hospital Name *</FieldLabel>
-            <Input value={form.name} onChange={updateField('name')} aria-invalid={!!errors.name} />
-            {errors.name && <FieldError>{errors.name}</FieldError>}
-          </div>
-          <div className="space-y-1">
-            <FieldLabel>Hospital Code *</FieldLabel>
-            <Input value={form.code} onChange={updateField('code')} placeholder="e.g. MCGH" aria-invalid={!!errors.code} />
-            {errors.code && <FieldError>{errors.code}</FieldError>}
-          </div>
-          <div className="space-y-1">
-            <FieldLabel>Email *</FieldLabel>
-            <Input type="email" value={form.email} onChange={updateField('email')} aria-invalid={!!errors.email} />
-            {errors.email && <FieldError>{errors.email}</FieldError>}
-          </div>
-          <div className="space-y-1">
-            <FieldLabel>Phone *</FieldLabel>
-            <Input value={form.phone} onChange={updateField('phone')} aria-invalid={!!errors.phone} />
-            {errors.phone && <FieldError>{errors.phone}</FieldError>}
-          </div>
-          <div className="space-y-1 sm:col-span-2">
-            <FieldLabel>Address</FieldLabel>
-            <Input value={form.address} onChange={updateField('address')} />
-          </div>
-          <div className="space-y-1">
-            <FieldLabel>City *</FieldLabel>
-            <Input value={form.city} onChange={updateField('city')} aria-invalid={!!errors.city} />
-            {errors.city && <FieldError>{errors.city}</FieldError>}
-          </div>
-          <div className="space-y-1">
-            <FieldLabel>Country *</FieldLabel>
-            <Input value={form.country} onChange={updateField('country')} aria-invalid={!!errors.country} />
-            {errors.country && <FieldError>{errors.country}</FieldError>}
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Hospital Information</p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1">
+              <FieldLabel>Hospital Name *</FieldLabel>
+              <Input value={form.name} onChange={updateField('name')} aria-invalid={!!errors.name} />
+              {errors.name && <FieldError>{errors.name}</FieldError>}
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>Hospital Code *</FieldLabel>
+              <Input value={form.code} onChange={updateField('code')} placeholder="e.g. MCGH" aria-invalid={!!errors.code} />
+              {errors.code && <FieldError>{errors.code}</FieldError>}
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>Hospital Email *</FieldLabel>
+              <Input type="email" value={form.email} onChange={updateField('email')} aria-invalid={!!errors.email} />
+              {errors.email && <FieldError>{errors.email}</FieldError>}
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>Hospital Phone *</FieldLabel>
+              <Input value={form.phone} onChange={updateField('phone')} aria-invalid={!!errors.phone} />
+              {errors.phone && <FieldError>{errors.phone}</FieldError>}
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <FieldLabel>Address Line 1</FieldLabel>
+              <Input value={form.addressLine1} onChange={updateField('addressLine1')} />
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <FieldLabel>Address Line 2</FieldLabel>
+              <Input value={form.addressLine2} onChange={updateField('addressLine2')} />
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>City *</FieldLabel>
+              <Input value={form.city} onChange={updateField('city')} aria-invalid={!!errors.city} />
+              {errors.city && <FieldError>{errors.city}</FieldError>}
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>State / Province</FieldLabel>
+              <Input value={form.state} onChange={updateField('state')} />
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>Country *</FieldLabel>
+              <Input value={form.country} onChange={updateField('country')} aria-invalid={!!errors.country} />
+              {errors.country && <FieldError>{errors.country}</FieldError>}
+            </div>
+            <div className="space-y-1">
+              <FieldLabel>Postal Code</FieldLabel>
+              <Input value={form.postalCode} onChange={updateField('postalCode')} />
+            </div>
           </div>
         </div>
 
@@ -116,57 +141,31 @@ function CreateHospitalForm({ onSave, isSubmitting }) {
               <Input value={form.adminLastName} onChange={updateField('adminLastName')} aria-invalid={!!errors.adminLastName} />
               {errors.adminLastName && <FieldError>{errors.adminLastName}</FieldError>}
             </div>
-            <div className="space-y-1 sm:col-span-2">
+            <div className="space-y-1">
               <FieldLabel>Admin Email *</FieldLabel>
               <Input type="email" value={form.adminEmail} onChange={updateField('adminEmail')} aria-invalid={!!errors.adminEmail} />
               {errors.adminEmail && <FieldError>{errors.adminEmail}</FieldError>}
             </div>
+            <div className="space-y-1">
+              <FieldLabel>Admin Phone</FieldLabel>
+              <Input value={form.adminPhone} onChange={updateField('adminPhone')} />
+            </div>
           </div>
+          <p className="mt-3 text-xs text-slate-500">
+            The admin will receive their login credentials by email once the hospital is created.
+          </p>
         </div>
 
         <div className="border-t border-slate-100 pt-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="space-y-1">
-              <FieldLabel>Subscription Plan *</FieldLabel>
-              <Select value={form.plan} onValueChange={(value) => setForm((prev) => ({ ...prev, plan: value }))}>
-                <SelectTrigger className="w-full" aria-invalid={!!errors.plan}>
-                  <SelectValue placeholder="Select plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  {plans.map((plan) => (
-                    <SelectItem key={plan.id} value={plan.name}>
-                      {plan.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.plan && <FieldError>{errors.plan}</FieldError>}
-            </div>
-            <div className="space-y-1">
-              <FieldLabel>Trial Period (days)</FieldLabel>
-              <Input type="number" min="0" value={form.trialDays} onChange={updateField('trialDays')} />
-            </div>
-            <div className="space-y-1">
-              <FieldLabel>Status</FieldLabel>
-              <Select value={form.status} onValueChange={(value) => setForm((prev) => ({ ...prev, status: value }))}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {hospitalStatusOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Trial</p>
+          <p className="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">
+            A 30-day free trial will start automatically when the hospital is created.
+          </p>
         </div>
       </div>
 
       <DialogFooter>
-        <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+        <DialogClose render={<Button type="button" variant="outline" disabled={isSubmitting} />}>Cancel</DialogClose>
         <Button onClick={handleSave} disabled={isSubmitting}>
           {isSubmitting ? 'Creating...' : 'Create Hospital'}
         </Button>
@@ -176,14 +175,19 @@ function CreateHospitalForm({ onSave, isSubmitting }) {
 }
 
 export function CreateHospitalDialog({ open, onOpenChange, onSave, isSubmitting = false }) {
-  const handleSave = (payload) => {
-    onSave(payload);
-    onOpenChange(false);
-    toast.success('Hospital created successfully');
+  const handleSave = async (payload) => {
+    try {
+      await onSave(payload);
+      onOpenChange(false);
+      toast.success('Hospital created successfully');
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || 'Failed to create hospital. Please try again.';
+      toast.error(message);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(next) => (isSubmitting ? null : onOpenChange(next))}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add Hospital</DialogTitle>

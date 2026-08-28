@@ -27,6 +27,8 @@ type RegisterUserData = {
 
   phone?: string;
 
+  hospitalId?: string;
+
   department?: string;
   specialty?: string;
 
@@ -155,9 +157,6 @@ const registerUser = async (userData: RegisterUserData) => {
     userId,
 
     verificationTokenHash,
-
-    isVerified: false,
-
     isFirstLogin: true,
 
     isActive: true,
