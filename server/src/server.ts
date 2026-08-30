@@ -1,3 +1,8 @@
+const moduleAlias = require('module-alias');
+moduleAlias.addAliases({
+  '@src': __dirname,
+});
+
 import 'dotenv/config';
 import 'colors';
 import app from './app';
