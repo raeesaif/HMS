@@ -7,7 +7,7 @@ import { PlanBadge } from '@/components/super-admin/PlanBadge';
 import { hospitalStatusMap } from '@/components/super-admin/statusMaps';
 import { HospitalsActionsMenu } from './HospitalsActionsMenu';
 
-const columns = ['Hospital', 'Code', 'Admin', 'Email', 'Phone', 'Subscription', 'Users', 'Registered', 'Status', ''];
+const columns = ['Hospital', 'Code', 'Admin', 'Email', 'Phone', 'Subscription', 'Users', 'Registered', 'Trial Ends', 'Status', ''];
 
 export function HospitalsTable({ hospitals, onAction, onClearFilters }) {
   if (hospitals.length === 0) {
@@ -27,7 +27,7 @@ export function HospitalsTable({ hospitals, onAction, onClearFilters }) {
 
   return (
     <div className="overflow-x-auto">
-      <Table className="min-w-[1180px]">
+      <Table className="min-w-[1300px]">
         <TableHeader className="bg-slate-50 [&_tr]:border-b-0">
           <TableRow className="hover:bg-transparent">
             {columns.map((label) => (
@@ -50,6 +50,7 @@ export function HospitalsTable({ hospitals, onAction, onClearFilters }) {
               </TableCell>
               <TableCell className="px-4 py-3.5 text-sm text-slate-600">{hospital.totalUsers.toLocaleString()}</TableCell>
               <TableCell className="px-4 py-3.5 text-xs text-slate-500">{hospital.registrationDate}</TableCell>
+              <TableCell className="px-4 py-3.5 text-xs text-slate-500">{hospital.trialEndsAt ?? '—'}</TableCell>
               <TableCell className="px-4 py-3.5">
                 <StatusBadge status={hospital.status} map={hospitalStatusMap} />
               </TableCell>

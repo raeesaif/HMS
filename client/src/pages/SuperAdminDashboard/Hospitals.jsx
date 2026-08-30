@@ -86,6 +86,8 @@ const Hospitals = () => {
     if (!next) setOpenDialog(null);
   };
 
+  const getErrorMessage = (error, fallback) => error?.response?.data?.message || error?.message || fallback;
+
   const handleAction = (action, hospital) => {
     setActiveHospital(hospital);
     if (action === 'view-users') {
@@ -93,7 +95,10 @@ const Hospitals = () => {
       return;
     }
     if (action === 'activate') {
-      activateHospital.mutate(hospital.id, { onSuccess: () => toast.success(`${hospital.name} activated`) });
+      activateHospital.mutate(hospital.id, {
+        onSuccess: () => toast.success(`${hospital.name} activated`),
+        onError: (error) => toast.error(getErrorMessage(error, 'Failed to activate hospital. Please try again.')),
+      });
       return;
     }
     setOpenDialog(action);
@@ -104,7 +109,7 @@ const Hospitals = () => {
   };
 
   const handleEdit = (hospitalId, payload) => {
-    updateHospital.mutate({ hospitalId, payload });
+    return updateHospital.mutateAsync({ hospitalId, payload });
   };
 
   const handleChangePlan = (hospitalId, payload) => {
@@ -118,6 +123,7 @@ const Hospitals = () => {
         setOpenDialog(null);
         toast.success(`${activeHospital.name} suspended`);
       },
+      onError: (error) => toast.error(getErrorMessage(error, 'Failed to suspend hospital. Please try again.')),
     });
   };
 
@@ -128,6 +134,7 @@ const Hospitals = () => {
         setOpenDialog(null);
         toast.success(`${activeHospital.name} deleted`);
       },
+      onError: (error) => toast.error(getErrorMessage(error, 'Failed to delete hospital. Please try again.')),
     });
   };
 
@@ -204,7 +211,7 @@ const Hospitals = () => {
 
       <CreateHospitalDialog open={openDialog === 'create'} onOpenChange={closeDialog} onSave={handleCreate} isSubmitting={createHospital.isPending} />
       <HospitalDetailsDialog hospital={activeHospital} open={openDialog === 'view'} onOpenChange={closeDialog} />
-      <EditHospitalDialog hospital={activeHospital} open={openDialog === 'edit'} onOpenChange={closeDialog} onSave={handleEdit} />
+      <EditHospitalDialog hospital={activeHospital} open={openDialog === 'edit'} onOpenChange={closeDialog} onSave={handleEdit} isSubmitting={updateHospital.isPending} />
       <ChangeHospitalPlanDialog hospital={activeHospital} open={openDialog === 'change-plan'} onOpenChange={closeDialog} onSave={handleChangePlan} />
       <SuspendHospitalDialog hospital={activeHospital} open={openDialog === 'suspend'} onOpenChange={closeDialog} onConfirm={handleSuspend} />
       <DeleteConfirmDialog

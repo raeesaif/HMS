@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { createHospital, getAllHospital } from '@src/services/hospitalService';
+import {
+  createHospital,
+  getAllHospital,
+  updateHospital,
+  getHospitalById,
+  deleteHospital,
+} from '@src/services/hospitalService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
 
@@ -21,5 +27,26 @@ export const getAllHospitalController = catchAsync(
     const result = await getAllHospital(page, limit);
 
     apiResponse.success(res, result, 'Hospitals fetched successfully', 200);
+  }
+);
+
+export const updateHospitalController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const hospital = await updateHospital(String(req.params.id), req.body);
+    apiResponse.success(res, hospital, 'Hospital updated successfully');
+  }
+);
+
+export const getHospitalController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const hospital = await getHospitalById(String(req.params.id));
+    apiResponse.success(res, hospital, 'Hospital fetched successfully');
+  }
+);
+
+export const deleteHospitalController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const hospital = await deleteHospital(String(req.params.id));
+    apiResponse.success(res, null, 'Hospital delete successfully');
   }
 );

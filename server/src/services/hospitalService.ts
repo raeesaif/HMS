@@ -2,6 +2,8 @@ import HospitalModel, { type HospitalType } from '@src/models/HospitalModel';
 import { Role } from '@src/models/UserModel';
 import { registerUser } from '@src/services/authService';
 import AppError from '@src/utils/appError';
+import UserModel from '@src/models/UserModel';
+import sanitizeUser from '@src/utils/sanitizeUser';
 
 const TRIAL_DURATION_DAYS = 30;
 
@@ -56,21 +58,34 @@ const createHospital = async (hospitalData: CreateHospitalData) => {
   }
 };
 
-
 const getAllHospital = async (page: number, limit: number) => {
   const skip = (page - 1) * limit;
 
   const [hospitals, total] = await Promise.all([
-    HospitalModel.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit),
+    HospitalModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
 
     HospitalModel.countDocuments(),
   ]);
 
+  const hospitalWithUsers = await Promise.all(
+    hospitals.map(async (hospital) => {
+      const [totalUser, adminUser] = await Promise.all([
+        UserModel.countDocuments({
+          hospitalId: hospital._id,
+          role: { $in: ['doctor', 'nurse', 'receptionist', 'patient'] },
+        }),
+        UserModel.findOne({ hospitalId: hospital._id, role: Role.Admin }),
+      ]);
+      return {
+        ...hospital.toObject(),
+        totalUser,
+        admin: adminUser ? sanitizeUser(adminUser) : null,
+      };
+    })
+  );
+
   return {
-    hospitals,
+    hospitals: hospitalWithUsers,
     pagination: {
       page,
       limit,
@@ -80,5 +95,49 @@ const getAllHospital = async (page: number, limit: number) => {
   };
 };
 
+const updateHospital = async (id: string, payload: any) => {
+  const { admin, ...hospitalFields } = payload;
 
-export { createHospital,getAllHospital };
+  const hospital = await HospitalModel.findByIdAndUpdate(id, hospitalFields, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!hospital) {
+    throw new AppError(404, 'Hospital not found');
+  }
+
+  let adminUser = null;
+  if (admin) {
+    adminUser = await UserModel.findOneAndUpdate(
+      { hospitalId: id, role: Role.Admin },
+      admin,
+      { new: true, runValidators: true }
+    );
+  }
+
+  return {
+    hospital,
+    admin: adminUser ? sanitizeUser(adminUser) : null,
+  };
+};
+
+const getHospitalById = async (id: string) => {
+  const hospital = await HospitalModel.findById(id);
+  if (!hospital) {
+    throw new AppError(404, 'Hospital not found');
+  }
+  return hospital;
+};
+
+const deleteHospital = async(id:string)=>{
+    const hospital = await HospitalModel.findByIdAndDelete(id)
+
+    if(!hospital){
+        throw new AppError(404,"Hospital not found")
+    }
+}
+
+
+
+export { createHospital, getAllHospital, updateHospital,getHospitalById,deleteHospital };

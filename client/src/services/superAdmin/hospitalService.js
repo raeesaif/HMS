@@ -1,13 +1,11 @@
-import { getHospitals, getHospitalById } from '@/data/superAdmin/hospitals';
-import { simulateRequest } from '@/services/apiClient';
 import { hospitalAPI } from '@/apis/hospitalApis';
 
 export function fetchHospitals() {
-  return simulateRequest(getHospitals());
+  return hospitalAPI.getAll();
 }
 
 export function fetchHospitalById(hospitalId) {
-  return simulateRequest(getHospitalById(hospitalId));
+  return hospitalAPI.getById(hospitalId);
 }
 
 export function createHospital(payload) {
@@ -15,17 +13,17 @@ export function createHospital(payload) {
 }
 
 export function updateHospital(hospitalId, payload) {
-  return simulateRequest({ id: hospitalId, ...payload });
+  return hospitalAPI.update(hospitalId, payload);
 }
 
 export function suspendHospital(hospitalId) {
-  return simulateRequest({ id: hospitalId, status: 'Suspended' });
+  return hospitalAPI.update(hospitalId, { status: 'suspended' });
 }
 
 export function activateHospital(hospitalId) {
-  return simulateRequest({ id: hospitalId, status: 'Active' });
+  return hospitalAPI.update(hospitalId, { status: 'active' });
 }
 
 export function deleteHospital(hospitalId) {
-  return simulateRequest({ id: hospitalId, deleted: true });
+  return hospitalAPI.remove(hospitalId);
 }
