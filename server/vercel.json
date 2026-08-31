@@ -1,5 +1,14 @@
 {
   "version": 2,
-  "builds": [{ "src": "src/server.ts", "use": "@vercel/node", "config": { "includeFiles": ["src/**"] } }],
+  "builds": [
+    {
+      "src": "src/server.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/**"],
+        "bundle": true
+      }
+    }
+  ],
   "routes": [{ "src": "/(.*)", "dest": "src/server.ts" }]
 }
