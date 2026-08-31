@@ -1,3 +1,4 @@
+"use strict";
 const welcomeEmailTemplate = (firstname, email, role, password, loginUrl) => `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -114,5 +115,4 @@ const welcomeEmailTemplate = (firstname, email, role, password, loginUrl) => `
 </body>
 </html>
 `;
-
 module.exports = welcomeEmailTemplate;

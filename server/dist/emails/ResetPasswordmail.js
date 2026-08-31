@@ -1,3 +1,4 @@
+"use strict";
 const resetPasswordEmailTemplate = (firstname, resetTokenUrl) => `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -76,5 +77,4 @@ const resetPasswordEmailTemplate = (firstname, resetTokenUrl) => `
 </body>
 </html>
 `;
-
 module.exports = resetPasswordEmailTemplate;
