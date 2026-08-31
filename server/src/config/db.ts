@@ -4,18 +4,16 @@ import mongoose from 'mongoose';
 const mongoUrl = process.env.MONGO_URI;
 
 if (!mongoUrl) {
-  console.log(
+  console.error(
     'MongoDB connection string is not defined in the environment variables.'
   );
-  process.exit(1);
+} else {
+  mongoose
+    .connect(mongoUrl)
+    .then(() => {
+      console.log('Connected to MongoDB successfully.');
+    })
+    .catch((error: unknown) => {
+      console.error('Error connecting to MongoDB:', error);
+    });
 }
-
-mongoose
-  .connect(mongoUrl)
-  .then(() => {
-    console.log('Connected to MongoDB successfully.');
-  })
-  .catch((error: unknown) => {
-    console.error('Error connecting to MongoDB:', error);
-    process.exit(1);
-  });
