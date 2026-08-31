@@ -26,8 +26,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "tsconfig-paths": "^4.2.0",
-    "tsc-alias": "^1.8.10",
     "bcryptjs": "^3.0.3",
     "colors": "^1.4.0",
     "cookie-parser": "^1.4.7",
@@ -44,6 +42,8 @@
     "mongoose": "^9.9.2",
     "morgan": "^1.11.0",
     "nodemailer": "^9.0.5",
+    "tsc-alias": "^1.9.3",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^4.4.3"
   }
 }
