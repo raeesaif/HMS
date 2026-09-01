@@ -18,24 +18,34 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select-field';
 import { PatientSchema } from '@/schema/PatientSchema';
-import { DEPARTMENTS, GENDERS, PATIENT_STATUSES, BLOOD_GROUPS } from '@/constants/patient';
+import { useDepartments } from '@/hooks/useDepartments';
+import { useRegister } from '@/hooks/useAuth';
+import {
+  REGISTER_GENDERS,
+  REGISTER_BLOOD_GROUPS,
+  REGISTER_PATIENT_STATUSES,
+} from '@/constants/registration';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const getDefaultValues = () => ({
-  name: '',
+  firstName: '',
+  lastName: '',
+  email: '',
   age: '',
   gender: '',
   phone: '',
   department: '',
   bloodGroup: '',
   doctor: '',
-  status: 'Stable',
-  admittedDate: todayISO(),
+  patientStatus: 'stable',
+  admissionDate: todayISO(),
 });
 
 const AddPatientDialog = ({ trigger, onAdd }) => {
   const [open, setOpen] = useState(false);
+  const { data: departments = [] } = useDepartments();
+  const registerMutation = useRegister();
 
   const {
     register,
@@ -48,10 +58,20 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
   });
 
   const onSubmit = (data) => {
-    onAdd?.(data);
-    toast.success(`${data.name} was added to patient records`);
-    reset(getDefaultValues());
-    setOpen(false);
+    registerMutation.mutate(
+      { ...data, role: 'patient' },
+      {
+        onSuccess: (user) => {
+          onAdd?.({ ...data, id: user.id, userId: user.userId });
+          toast.success(`${data.firstName} ${data.lastName} was added to patient records`);
+          reset(getDefaultValues());
+          setOpen(false);
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message ?? 'Failed to add patient');
+        },
+      }
+    );
   };
 
   const handleOpenChange = (next) => {
@@ -66,7 +86,8 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
         <DialogHeader>
           <DialogTitle>Add New Patient</DialogTitle>
           <DialogDescription>
-            Enter the patient's details to create a new record.
+            Enter the patient's details to create a new record. Login credentials are emailed
+            automatically.
           </DialogDescription>
         </DialogHeader>
 
@@ -75,11 +96,27 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
+          <div className="space-y-1">
+            <FieldLabel>First Name</FieldLabel>
+            <Input {...register('firstName')} placeholder="e.g. Ama" />
+            {errors.firstName && (
+              <p className="text-destructive text-sm">{errors.firstName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <FieldLabel>Last Name</FieldLabel>
+            <Input {...register('lastName')} placeholder="e.g. Owusu" />
+            {errors.lastName && (
+              <p className="text-destructive text-sm">{errors.lastName.message}</p>
+            )}
+          </div>
+
           <div className="space-y-1 sm:col-span-2">
-            <FieldLabel>Full Name</FieldLabel>
-            <Input {...register('name')} placeholder="e.g. Ama Owusu" />
-            {errors.name && (
-              <p className="text-destructive text-sm">{errors.name.message}</p>
+            <FieldLabel>Email</FieldLabel>
+            <Input {...register('email')} type="email" placeholder="patient@hms.com" />
+            {errors.email && (
+              <p className="text-destructive text-sm">{errors.email.message}</p>
             )}
           </div>
 
@@ -95,9 +132,9 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
             <option value="" disabled>
               Select gender
             </option>
-            {GENDERS.map((gender) => (
-              <option key={gender} value={gender}>
-                {gender}
+            {REGISTER_GENDERS.map((gender) => (
+              <option key={gender.value} value={gender.value}>
+                {gender.label}
               </option>
             ))}
           </SelectField>
@@ -114,9 +151,9 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
             <option value="" disabled>
               Select department
             </option>
-            {DEPARTMENTS.map((department) => (
-              <option key={department} value={department}>
-                {department}
+            {departments.map((department) => (
+              <option key={department.id} value={department.name}>
+                {department.name}
               </option>
             ))}
           </SelectField>
@@ -125,7 +162,7 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
             <option value="" disabled>
               Select blood group
             </option>
-            {BLOOD_GROUPS.map((bloodGroup) => (
+            {REGISTER_BLOOD_GROUPS.map((bloodGroup) => (
               <option key={bloodGroup} value={bloodGroup}>
                 {bloodGroup}
               </option>
@@ -134,25 +171,29 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
 
           <div className="space-y-1">
             <FieldLabel>Doctor</FieldLabel>
-            <Input {...register('doctor')} placeholder="e.g. Dr. Boateng" />
+            <Input {...register('doctor')} placeholder="Staff ID or email" />
             {errors.doctor && (
               <p className="text-destructive text-sm">{errors.doctor.message}</p>
             )}
           </div>
 
-          <SelectField label="Status" error={errors.status} {...register('status')}>
-            {PATIENT_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
+          <SelectField
+            label="Status"
+            error={errors.patientStatus}
+            {...register('patientStatus')}
+          >
+            {REGISTER_PATIENT_STATUSES.map((status) => (
+              <option key={status.value} value={status.value}>
+                {status.label}
               </option>
             ))}
           </SelectField>
 
           <div className="space-y-1">
             <FieldLabel>Admission Date</FieldLabel>
-            <Input {...register('admittedDate')} type="date" />
-            {errors.admittedDate && (
-              <p className="text-destructive text-sm">{errors.admittedDate.message}</p>
+            <Input {...register('admissionDate')} type="date" />
+            {errors.admissionDate && (
+              <p className="text-destructive text-sm">{errors.admissionDate.message}</p>
             )}
           </div>
         </form>
@@ -161,8 +202,8 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
           <DialogClose render={<Button type="button" variant="outline" />}>
             Cancel
           </DialogClose>
-          <Button type="submit" form="add-patient-form">
-            Add Patient
+          <Button type="submit" form="add-patient-form" disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? 'Adding…' : 'Add Patient'}
           </Button>
         </DialogFooter>
       </DialogContent>

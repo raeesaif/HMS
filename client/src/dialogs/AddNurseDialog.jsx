@@ -16,22 +16,25 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select-field';
 import { NurseSchema } from '@/schema/StaffSchema';
-import { DEPARTMENTS } from '@/constants/patient';
-import { STAFF_STATUSES } from '@/constants/staff';
+import { useDepartments } from '@/hooks/useDepartments';
+import { useRegister } from '@/hooks/useAuth';
 
 const getDefaultValues = () => ({
-  name: '',
+  firstName: '',
+  lastName: '',
   department: '',
   ward: '',
-  nurseId: '',
+  licenseNumber: '',
   email: '',
   phone: '',
   shiftStart: '',
   shiftEnd: '',
-  status: 'On duty',
 });
 
 const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
+  const { data: departments = [] } = useDepartments();
+  const registerMutation = useRegister();
+
   const {
     register,
     handleSubmit,
@@ -43,10 +46,20 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
   });
 
   const onSubmit = (data) => {
-    onAdd?.(data);
-    toast.success(`${data.name} was added to staff`);
-    reset(getDefaultValues());
-    onOpenChange?.(false);
+    registerMutation.mutate(
+      { ...data, role: 'nurse' },
+      {
+        onSuccess: (user) => {
+          onAdd?.({ ...data, id: user.id, userId: user.userId });
+          toast.success(`${data.firstName} ${data.lastName} was added to staff`);
+          reset(getDefaultValues());
+          onOpenChange?.(false);
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message ?? 'Failed to add nurse');
+        },
+      }
+    );
   };
 
   const handleOpenChange = (next) => {
@@ -59,7 +72,10 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Nurse</DialogTitle>
-          <DialogDescription>Enter the nurse's profile and shift details.</DialogDescription>
+          <DialogDescription>
+            Enter the nurse's profile and shift details. Login credentials are emailed
+            automatically.
+          </DialogDescription>
         </DialogHeader>
 
         <form
@@ -67,11 +83,19 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
-          <div className="space-y-1 sm:col-span-2">
-            <FieldLabel>Full Name</FieldLabel>
-            <Input {...register('name')} placeholder="e.g. Abena Mensah" />
-            {errors.name && (
-              <p className="text-destructive text-sm">{errors.name.message}</p>
+          <div className="space-y-1">
+            <FieldLabel>First Name</FieldLabel>
+            <Input {...register('firstName')} placeholder="e.g. Abena" />
+            {errors.firstName && (
+              <p className="text-destructive text-sm">{errors.firstName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <FieldLabel>Last Name</FieldLabel>
+            <Input {...register('lastName')} placeholder="e.g. Mensah" />
+            {errors.lastName && (
+              <p className="text-destructive text-sm">{errors.lastName.message}</p>
             )}
           </div>
 
@@ -79,9 +103,9 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
             <option value="" disabled>
               Select department
             </option>
-            {DEPARTMENTS.map((department) => (
-              <option key={department} value={department}>
-                {department}
+            {departments.map((department) => (
+              <option key={department.id} value={department.name}>
+                {department.name}
               </option>
             ))}
           </SelectField>
@@ -95,10 +119,10 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
           </div>
 
           <div className="space-y-1">
-            <FieldLabel>Nurse ID</FieldLabel>
-            <Input {...register('nurseId')} placeholder="e.g. RN-2031" />
-            {errors.nurseId && (
-              <p className="text-destructive text-sm">{errors.nurseId.message}</p>
+            <FieldLabel>License Number</FieldLabel>
+            <Input {...register('licenseNumber')} placeholder="e.g. RN-2031" />
+            {errors.licenseNumber && (
+              <p className="text-destructive text-sm">{errors.licenseNumber.message}</p>
             )}
           </div>
 
@@ -133,24 +157,14 @@ const AddNurseDialog = ({ open, onOpenChange, onAdd }) => {
               <p className="text-destructive text-sm">{errors.shiftEnd.message}</p>
             )}
           </div>
-
-          <div className="sm:col-span-2">
-            <SelectField label="Status" error={errors.status} {...register('status')}>
-              {STAFF_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </SelectField>
-          </div>
         </form>
 
         <DialogFooter>
           <DialogClose render={<Button type="button" variant="outline" />}>
             Cancel
           </DialogClose>
-          <Button type="submit" form="add-nurse-form">
-            Add Nurse
+          <Button type="submit" form="add-nurse-form" disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? 'Adding…' : 'Add Nurse'}
           </Button>
         </DialogFooter>
       </DialogContent>

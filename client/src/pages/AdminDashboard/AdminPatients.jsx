@@ -39,20 +39,15 @@ const AdminPatients = () => {
   const handleAddPatient = (values) => {
     const newPatient = {
       id: `P-${10248 + patients.length}`,
-      name: values.name,
+      name: `${values.firstName} ${values.lastName}`,
       age: Number(values.age),
-      sex:
-        values.gender === 'Female'
-          ? 'F'
-          : values.gender === 'Male'
-            ? 'M'
-            : values.gender,
+      sex: values.gender === 'female' ? 'F' : values.gender === 'male' ? 'M' : values.gender,
       phone: values.phone,
       department: values.department,
       bloodGroup: values.bloodGroup,
       doctor: values.doctor,
-      admitted: formatAdmittedDate(values.admittedDate),
-      status: values.status,
+      admitted: formatAdmittedDate(values.admissionDate),
+      status: values.patientStatus,
     };
     setPatients((prev) => [newPatient, ...prev]);
   };

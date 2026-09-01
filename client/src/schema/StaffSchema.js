@@ -1,36 +1,46 @@
 import zod from 'zod';
 
-export const DoctorSchema = zod.object({
-  name: zod.string().min(1, 'Full name is required'),
-  specialty: zod.string().min(1, 'Specialty is required'),
-  department: zod.string().min(1, 'Select a department'),
-  license: zod.string().min(1, 'License number is required'),
-  email: zod.string().min(1, 'Email is required').email('Invalid email address'),
-  phone: zod.string().min(1, 'Phone number is required'),
+const baseStaffFields = {
+  firstName: zod
+    .string()
+    .trim()
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must be at most 50 characters'),
+  lastName: zod
+    .string()
+    .trim()
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name must be at most 50 characters'),
+  email: zod.string().trim().min(1, 'Email is required').email('Invalid email address'),
+  phone: zod
+    .string()
+    .trim()
+    .min(7, 'Phone number is too short')
+    .max(20, 'Phone number is too long'),
   shiftStart: zod.string().min(1, 'Shift start is required'),
   shiftEnd: zod.string().min(1, 'Shift end is required'),
-  status: zod.string().min(1, 'Select a status'),
+};
+
+export const DoctorSchema = zod.object({
+  ...baseStaffFields,
+  department: zod.string().min(1, 'Select a department'),
+  specialty: zod.string().min(1, 'Select a specialty'),
+  licenseNumber: zod.string().trim().min(1, 'License number is required'),
+  qualification: zod.string().trim().min(1, 'Qualification is required'),
+  experience: zod.coerce
+    .number({ invalid_type_error: 'Experience must be a number' })
+    .int('Experience must be a whole number')
+    .min(0, 'Experience cannot be negative'),
 });
 
 export const NurseSchema = zod.object({
-  name: zod.string().min(1, 'Full name is required'),
+  ...baseStaffFields,
   department: zod.string().min(1, 'Select a department'),
-  ward: zod.string().min(1, 'Ward / unit is required'),
-  nurseId: zod.string().min(1, 'Nurse ID is required'),
-  email: zod.string().min(1, 'Email is required').email('Invalid email address'),
-  phone: zod.string().min(1, 'Phone number is required'),
-  shiftStart: zod.string().min(1, 'Shift start is required'),
-  shiftEnd: zod.string().min(1, 'Shift end is required'),
-  status: zod.string().min(1, 'Select a status'),
+  ward: zod.string().trim().min(1, 'Ward / unit is required'),
+  licenseNumber: zod.string().trim().min(1, 'License number is required'),
 });
 
 export const ReceptionistSchema = zod.object({
-  name: zod.string().min(1, 'Full name is required'),
-  desk: zod.string().min(1, 'Desk / location is required'),
-  employeeId: zod.string().min(1, 'Employee ID is required'),
-  email: zod.string().min(1, 'Email is required').email('Invalid email address'),
-  phone: zod.string().min(1, 'Phone number is required'),
-  shiftStart: zod.string().min(1, 'Shift start is required'),
-  shiftEnd: zod.string().min(1, 'Shift end is required'),
-  status: zod.string().min(1, 'Select a status'),
+  ...baseStaffFields,
+  staffDepartment: zod.string().trim().min(1, 'Staff department is required'),
 });

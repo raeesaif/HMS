@@ -16,22 +16,29 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select-field';
 import { DoctorSchema } from '@/schema/StaffSchema';
-import { DEPARTMENTS } from '@/constants/patient';
-import { STAFF_STATUSES } from '@/constants/staff';
+import { useDepartments } from '@/hooks/useDepartments';
+import { useSpecialties } from '@/hooks/useSpecialties';
+import { useRegister } from '@/hooks/useAuth';
 
 const getDefaultValues = () => ({
-  name: '',
+  firstName: '',
+  lastName: '',
   specialty: '',
   department: '',
-  license: '',
+  licenseNumber: '',
+  qualification: '',
+  experience: '',
   email: '',
   phone: '',
   shiftStart: '',
   shiftEnd: '',
-  status: 'On duty',
 });
 
 const AddDoctorDialog = ({ open, onOpenChange, onAdd }) => {
+  const { data: departments = [] } = useDepartments();
+  const { data: specialties = [] } = useSpecialties();
+  const registerMutation = useRegister();
+
   const {
     register,
     handleSubmit,
@@ -43,10 +50,20 @@ const AddDoctorDialog = ({ open, onOpenChange, onAdd }) => {
   });
 
   const onSubmit = (data) => {
-    onAdd?.(data);
-    toast.success(`Dr. ${data.name} was added to staff`);
-    reset(getDefaultValues());
-    onOpenChange?.(false);
+    registerMutation.mutate(
+      { ...data, role: 'doctor' },
+      {
+        onSuccess: (user) => {
+          onAdd?.({ ...data, id: user.id, userId: user.userId });
+          toast.success(`Dr. ${data.firstName} ${data.lastName} was added to staff`);
+          reset(getDefaultValues());
+          onOpenChange?.(false);
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message ?? 'Failed to add doctor');
+        },
+      }
+    );
   };
 
   const handleOpenChange = (next) => {
@@ -59,7 +76,10 @@ const AddDoctorDialog = ({ open, onOpenChange, onAdd }) => {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Doctor</DialogTitle>
-          <DialogDescription>Enter the doctor's profile and shift details.</DialogDescription>
+          <DialogDescription>
+            Enter the doctor's profile and shift details. Login credentials are emailed
+            automatically.
+          </DialogDescription>
         </DialogHeader>
 
         <form
@@ -67,38 +87,65 @@ const AddDoctorDialog = ({ open, onOpenChange, onAdd }) => {
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
-          <div className="space-y-1 sm:col-span-2">
-            <FieldLabel>Full Name</FieldLabel>
-            <Input {...register('name')} placeholder="e.g. Kwame Boateng" />
-            {errors.name && (
-              <p className="text-destructive text-sm">{errors.name.message}</p>
+          <div className="space-y-1">
+            <FieldLabel>First Name</FieldLabel>
+            <Input {...register('firstName')} placeholder="e.g. Kwame" />
+            {errors.firstName && (
+              <p className="text-destructive text-sm">{errors.firstName.message}</p>
             )}
           </div>
 
           <div className="space-y-1">
-            <FieldLabel>Specialty</FieldLabel>
-            <Input {...register('specialty')} placeholder="e.g. Cardiologist" />
-            {errors.specialty && (
-              <p className="text-destructive text-sm">{errors.specialty.message}</p>
+            <FieldLabel>Last Name</FieldLabel>
+            <Input {...register('lastName')} placeholder="e.g. Boateng" />
+            {errors.lastName && (
+              <p className="text-destructive text-sm">{errors.lastName.message}</p>
             )}
           </div>
+
+          <SelectField label="Specialty" error={errors.specialty} {...register('specialty')}>
+            <option value="" disabled>
+              Select specialty
+            </option>
+            {specialties.map((specialty) => (
+              <option key={specialty.id} value={specialty.name}>
+                {specialty.name}
+              </option>
+            ))}
+          </SelectField>
 
           <SelectField label="Department" error={errors.department} {...register('department')}>
             <option value="" disabled>
               Select department
             </option>
-            {DEPARTMENTS.map((department) => (
-              <option key={department} value={department}>
-                {department}
+            {departments.map((department) => (
+              <option key={department.id} value={department.name}>
+                {department.name}
               </option>
             ))}
           </SelectField>
 
           <div className="space-y-1">
             <FieldLabel>License Number</FieldLabel>
-            <Input {...register('license')} placeholder="e.g. GMC-4821" />
-            {errors.license && (
-              <p className="text-destructive text-sm">{errors.license.message}</p>
+            <Input {...register('licenseNumber')} placeholder="e.g. GMC-4821" />
+            {errors.licenseNumber && (
+              <p className="text-destructive text-sm">{errors.licenseNumber.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <FieldLabel>Qualification</FieldLabel>
+            <Input {...register('qualification')} placeholder="e.g. MBBS, MD" />
+            {errors.qualification && (
+              <p className="text-destructive text-sm">{errors.qualification.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <FieldLabel>Experience (years)</FieldLabel>
+            <Input {...register('experience')} type="number" min="0" placeholder="e.g. 8" />
+            {errors.experience && (
+              <p className="text-destructive text-sm">{errors.experience.message}</p>
             )}
           </div>
 
@@ -133,24 +180,14 @@ const AddDoctorDialog = ({ open, onOpenChange, onAdd }) => {
               <p className="text-destructive text-sm">{errors.shiftEnd.message}</p>
             )}
           </div>
-
-          <div className="sm:col-span-2">
-            <SelectField label="Status" error={errors.status} {...register('status')}>
-              {STAFF_STATUSES.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </SelectField>
-          </div>
         </form>
 
         <DialogFooter>
           <DialogClose render={<Button type="button" variant="outline" />}>
             Cancel
           </DialogClose>
-          <Button type="submit" form="add-doctor-form">
-            Add Doctor
+          <Button type="submit" form="add-doctor-form" disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? 'Adding…' : 'Add Doctor'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -15,9 +15,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReceptionDatePicker } from '@/components/reception/ReceptionDatePicker';
-import { bloodGroupOptions, genderOptions } from '@/data/receptionistPatients';
+import { bloodGroupOptions } from '@/data/receptionistPatients';
+import { useDepartments } from '@/hooks/useDepartments';
+import { useRegister } from '@/hooks/useAuth';
+import { REGISTER_PATIENT_STATUSES } from '@/constants/registration';
 
 const PHONE_REGEX = /^[+]?[\d\s-]{7,20}$/;
+const REGISTRATION_GENDERS = ['Male', 'Female'];
+
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+const calculateAge = (dob) => {
+  if (!dob) return null;
+  const dobDate = new Date(dob);
+  if (Number.isNaN(dobDate.getTime())) return null;
+  const diffMs = Date.now() - dobDate.getTime();
+  return Math.max(0, Math.floor(diffMs / (365.25 * 24 * 60 * 60 * 1000)));
+};
 
 function validate(form) {
   const errors = {};
@@ -25,6 +39,7 @@ function validate(form) {
   if (!form.lastName.trim()) errors.lastName = 'Last name is required';
   if (!form.dateOfBirth) errors.dateOfBirth = 'Date of birth is required';
   if (!form.gender) errors.gender = 'Gender is required';
+  if (!form.email.trim()) errors.email = 'Email is required';
   if (!form.phone.trim()) errors.phone = 'Phone number is required';
   else if (!PHONE_REGEX.test(form.phone.trim())) errors.phone = 'Enter a valid phone number';
   if (!form.address.trim()) errors.address = 'Address is required';
@@ -32,10 +47,16 @@ function validate(form) {
   if (!form.identification.trim()) errors.identification = 'Identification (CNIC/Passport) is required';
   if (!form.emergencyContactName.trim()) errors.emergencyContactName = 'Emergency contact name is required';
   if (!form.emergencyContactPhone.trim()) errors.emergencyContactPhone = 'Emergency contact phone is required';
+  if (!form.department) errors.department = 'Department is required';
+  if (!form.doctor.trim()) errors.doctor = "Doctor's staff ID or email is required";
+  if (!form.admissionDate) errors.admissionDate = 'Admission date is required';
   return errors;
 }
 
 function AddPatientForm({ onOpenChange, onSave }) {
+  const { data: departments = [] } = useDepartments();
+  const registerMutation = useRegister();
+
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -49,6 +70,10 @@ function AddPatientForm({ onOpenChange, onSave }) {
     emergencyContactName: '',
     emergencyContactRelationship: '',
     emergencyContactPhone: '',
+    department: '',
+    patientStatus: 'stable',
+    doctor: '',
+    admissionDate: todayISO(),
   });
   const [errors, setErrors] = useState({});
 
@@ -59,25 +84,58 @@ function AddPatientForm({ onOpenChange, onSave }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    onSave({
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      name: `${form.firstName.trim()} ${form.lastName.trim()}`,
-      dateOfBirth: form.dateOfBirth,
-      gender: form.gender,
-      phone: form.phone.trim(),
-      email: form.email.trim(),
-      address: form.address.trim(),
-      bloodGroup: form.bloodGroup,
-      identification: form.identification.trim(),
-      emergencyContact: {
-        name: form.emergencyContactName.trim(),
-        relationship: form.emergencyContactRelationship.trim(),
-        phone: form.emergencyContactPhone.trim(),
+    const age = calculateAge(form.dateOfBirth);
+
+    registerMutation.mutate(
+      {
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        role: 'patient',
+        gender: form.gender.toLowerCase(),
+        department: form.department,
+        bloodGroup: form.bloodGroup,
+        doctor: form.doctor.trim(),
+        patientStatus: form.patientStatus,
+        admissionDate: form.admissionDate,
+        age,
       },
-    });
-    onOpenChange(false);
-    toast.success('Patient registered successfully');
+      {
+        onSuccess: (user) => {
+          onSave({
+            id: user.id,
+            userId: user.userId,
+            firstName: form.firstName.trim(),
+            lastName: form.lastName.trim(),
+            name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+            dateOfBirth: form.dateOfBirth,
+            age,
+            gender: form.gender,
+            phone: form.phone.trim(),
+            email: form.email.trim(),
+            address: form.address.trim(),
+            bloodGroup: form.bloodGroup,
+            identification: form.identification.trim(),
+            emergencyContact: {
+              name: form.emergencyContactName.trim(),
+              relationship: form.emergencyContactRelationship.trim(),
+              phone: form.emergencyContactPhone.trim(),
+            },
+            department: form.department,
+            patientStatus: form.patientStatus,
+            doctor: form.doctor.trim(),
+            admissionDate: form.admissionDate,
+            status: 'Active',
+          });
+          onOpenChange(false);
+          toast.success('Patient registered successfully');
+        },
+        onError: (error) => {
+          toast.error(error.response?.data?.message ?? 'Failed to register patient');
+        },
+      }
+    );
   };
 
   return (
@@ -106,7 +164,7 @@ function AddPatientForm({ onOpenChange, onSave }) {
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
-                {genderOptions.map((option) => (
+                {REGISTRATION_GENDERS.map((option) => (
                   <SelectItem key={option} value={option}>
                     {option}
                   </SelectItem>
@@ -121,8 +179,9 @@ function AddPatientForm({ onOpenChange, onSave }) {
             {errors.phone && <FieldError>{errors.phone}</FieldError>}
           </div>
           <div className="space-y-1">
-            <FieldLabel>Email</FieldLabel>
-            <Input type="email" value={form.email} onChange={updateField('email')} placeholder="patient@example.com" />
+            <FieldLabel>Email *</FieldLabel>
+            <Input type="email" value={form.email} onChange={updateField('email')} aria-invalid={!!errors.email} placeholder="patient@example.com" />
+            {errors.email && <FieldError>{errors.email}</FieldError>}
           </div>
           <div className="space-y-1">
             <FieldLabel>Blood Group *</FieldLabel>
@@ -144,6 +203,47 @@ function AddPatientForm({ onOpenChange, onSave }) {
             <FieldLabel>Identification (CNIC/Passport) *</FieldLabel>
             <Input value={form.identification} onChange={updateField('identification')} aria-invalid={!!errors.identification} />
             {errors.identification && <FieldError>{errors.identification}</FieldError>}
+          </div>
+          <div className="space-y-1">
+            <FieldLabel>Department *</FieldLabel>
+            <Select value={form.department} onValueChange={(value) => setForm((prev) => ({ ...prev, department: value }))}>
+              <SelectTrigger className="w-full" aria-invalid={!!errors.department}>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((department) => (
+                  <SelectItem key={department.id} value={department.name}>
+                    {department.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.department && <FieldError>{errors.department}</FieldError>}
+          </div>
+          <div className="space-y-1">
+            <FieldLabel>Attending Doctor *</FieldLabel>
+            <Input value={form.doctor} onChange={updateField('doctor')} aria-invalid={!!errors.doctor} placeholder="Staff ID or email" />
+            {errors.doctor && <FieldError>{errors.doctor}</FieldError>}
+          </div>
+          <div className="space-y-1">
+            <FieldLabel>Status</FieldLabel>
+            <Select value={form.patientStatus} onValueChange={(value) => setForm((prev) => ({ ...prev, patientStatus: value }))}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {REGISTER_PATIENT_STATUSES.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <FieldLabel>Admission Date *</FieldLabel>
+            <ReceptionDatePicker date={form.admissionDate} onSelect={(date) => setForm((prev) => ({ ...prev, admissionDate: date }))} />
+            {errors.admissionDate && <FieldError>{errors.admissionDate}</FieldError>}
           </div>
         </div>
 
@@ -173,7 +273,9 @@ function AddPatientForm({ onOpenChange, onSave }) {
 
       <DialogFooter>
         <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
-        <Button onClick={handleSave}>Register Patient</Button>
+        <Button onClick={handleSave} disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? 'Registering…' : 'Register Patient'}
+        </Button>
       </DialogFooter>
     </>
   );
@@ -186,7 +288,7 @@ export function AddPatientDialog({ open, onOpenChange, onSave }) {
         <DialogHeader>
           <DialogTitle>Register New Patient</DialogTitle>
           <DialogDescription>
-            Enter demographic and contact details. Clinical information is recorded separately by medical staff.
+            Enter demographic and contact details. Login credentials are emailed automatically.
           </DialogDescription>
         </DialogHeader>
 

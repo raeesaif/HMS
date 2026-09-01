@@ -40,12 +40,12 @@ const AdminStaff = () => {
   const handleAddDoctor = (values) => {
     addStaffMember({
       type: 'doctor',
-      name: `Dr. ${values.name}`,
+      name: `Dr. ${values.firstName} ${values.lastName}`,
       role: values.specialty,
       department: values.department,
       rating: '—',
       patients: '—',
-      status: values.status,
+      status: 'On duty',
       shift: `${values.shiftStart} – ${values.shiftEnd}`,
       email: values.email,
       phone: values.phone,
@@ -55,12 +55,12 @@ const AdminStaff = () => {
   const handleAddNurse = (values) => {
     addStaffMember({
       type: 'nurse',
-      name: values.name,
+      name: `${values.firstName} ${values.lastName}`,
       role: `Nurse · ${values.ward}`,
       department: values.department,
       rating: '—',
       patients: '—',
-      status: values.status,
+      status: 'On duty',
       shift: `${values.shiftStart} – ${values.shiftEnd}`,
       email: values.email,
       phone: values.phone,
@@ -70,12 +70,12 @@ const AdminStaff = () => {
   const handleAddReceptionist = (values) => {
     addStaffMember({
       type: 'receptionist',
-      name: values.name,
-      role: `Receptionist · ${values.desk}`,
-      department: '—',
+      name: `${values.firstName} ${values.lastName}`,
+      role: `Receptionist · ${values.staffDepartment}`,
+      department: values.staffDepartment,
       rating: '—',
       patients: '—',
-      status: values.status,
+      status: 'On duty',
       shift: `${values.shiftStart} – ${values.shiftEnd}`,
       email: values.email,
       phone: values.phone,

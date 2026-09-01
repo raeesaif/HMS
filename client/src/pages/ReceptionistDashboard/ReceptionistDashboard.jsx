@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReceptionStatsCard } from '@/components/reception/ReceptionStatsCard';
 import { ErrorState } from '@/components/reception/ErrorState';
@@ -8,12 +9,24 @@ import { DoctorsOverview } from '@/components/reception/dashboard/DoctorsOvervie
 import { EmergencyOverview } from '@/components/reception/dashboard/EmergencyOverview';
 import { PaymentsOverview } from '@/components/reception/dashboard/PaymentsOverview';
 import { QuickActions } from '@/components/reception/dashboard/QuickActions';
+import { AddPatientDialog } from '@/components/dialogs/receptionist/AddPatientDialog';
 import { quickActions } from '@/data/receptionistDashboard';
 import { useReceptionDashboard } from '@/hooks/useReceptionDashboard';
+
+const REGISTER_PATIENT_ACTION_ID = 'qa-1';
 
 const ReceptionistDashboard = () => {
   const navigate = useNavigate();
   const { data, isLoading, error, reload } = useReceptionDashboard();
+  const [isAddPatientOpen, setIsAddPatientOpen] = useState(false);
+
+  const handleQuickAction = (action) => {
+    if (action.id === REGISTER_PATIENT_ACTION_ID) {
+      setIsAddPatientOpen(true);
+      return;
+    }
+    navigate(action.path);
+  };
 
   if (error) {
     return (
@@ -53,7 +66,7 @@ const ReceptionistDashboard = () => {
           <QueueOverview queue={data?.queue ?? []} isLoading={isLoading} onViewAll={() => navigate('/reception/queue')} />
           <DoctorsOverview doctors={data?.doctors ?? []} isLoading={isLoading} onViewAll={() => navigate('/reception/doctors')} />
         </div>
-        <QuickActions actions={quickActions} />
+        <QuickActions actions={quickActions} onAction={handleQuickAction} />
       </div>
 
       <EmergencyOverview
@@ -63,6 +76,12 @@ const ReceptionistDashboard = () => {
       />
 
       <PaymentsOverview payments={data?.payments ?? []} isLoading={isLoading} onViewAll={() => navigate('/reception/billing')} />
+
+      <AddPatientDialog
+        open={isAddPatientOpen}
+        onOpenChange={setIsAddPatientOpen}
+        onSave={() => setIsAddPatientOpen(false)}
+      />
     </div>
   );
 };

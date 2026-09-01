@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { QuickActionCard } from './QuickActionCard';
 
-export function QuickActions({ actions = [] }) {
+export function QuickActions({ actions = [], onAction }) {
   const navigate = useNavigate();
   return (
     <Card className="gap-0 rounded-xl border-border py-0 shadow-sm">
@@ -17,7 +17,7 @@ export function QuickActions({ actions = [] }) {
             icon={action.icon}
             label={action.label}
             description={action.description}
-            onClick={() => navigate(action.path)}
+            onClick={() => (onAction ? onAction(action) : navigate(action.path))}
           />
         ))}
       </div>

@@ -32,6 +32,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
   ],
   [Role.Nurse]: [
     'department',
+    'ward',
     'licenseNumber',
     'shiftStart',
     'shiftEnd',
@@ -41,6 +42,7 @@ const ROLE_FIELDS: Record<Role, readonly string[]> = {
   ],
   [Role.Receptionist]: [
     'department',
+    'staffDepartment',
     'shiftStart',
     'shiftEnd',
     'dutyStatus',

@@ -17,3 +17,10 @@ export const useGetMe = () => {
     enabled: Boolean(accessToken),
   });
 };
+
+export const useRegister = () => {
+  return useMutation({
+    mutationKey: ['register'],
+    mutationFn: (data) => authAPI.register(data),
+  });
+};

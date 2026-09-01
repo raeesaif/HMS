@@ -16,7 +16,7 @@ import { EditPatientDialog } from '@/components/dialogs/receptionist/EditPatient
 import { PatientDetailsDialog } from '@/components/dialogs/receptionist/PatientDetailsDialog';
 import { AppointmentDialog } from '@/components/dialogs/receptionist/AppointmentDialog';
 import { usePatients } from '@/hooks/usePatients';
-import { registerPatient, updatePatient as updatePatientService } from '@/services/patientService';
+import { updatePatient as updatePatientService } from '@/services/patientService';
 import { createAppointment } from '@/services/appointmentService';
 
 const PAGE_SIZE = 6;
@@ -76,10 +76,8 @@ const Patients = () => {
     if (!next) setOpenDialog(null);
   };
 
-  const handleRegister = (payload) => {
-    registerPatient(payload).then((newPatient) => {
-      setPatients((current) => [newPatient, ...current]);
-    });
+  const handleRegister = (newPatient) => {
+    setPatients((current) => [newPatient, ...current]);
   };
 
   const handleEditSave = (patientId, payload) => {

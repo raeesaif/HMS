@@ -41,6 +41,9 @@ type RegisterUserData = {
   dutyStatus?: 'On Duty' | 'Off Duty';
   availabilityStatus?: 'Available' | 'Break' | 'Busy';
 
+  staffDepartment?: string;
+  ward?: string;
+
   gender?: 'male' | 'female';
 
   patientStatus?: 'stable' | 'observation' | 'critical' | 'discharged';
