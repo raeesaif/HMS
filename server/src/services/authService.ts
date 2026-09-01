@@ -16,7 +16,7 @@ import sendEmail from '@src/utils/sendEmail';
 import AppError from '@src/utils/appError';
 import sanitizeUser from '@src/utils/sanitizeUser';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const welcomeEmailTemplate = require('@src/emails/WelcomeEmail').default;
+const welcomeEmailTemplate = require('@src/emails/WelcomeEmail');
 
 type RegisterUserData = {
   firstName: string;

@@ -15,7 +15,7 @@ const sendEmail_1 = __importDefault(require("../utils/sendEmail"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const sanitizeUser_1 = __importDefault(require("../utils/sanitizeUser"));
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const welcomeEmailTemplate = require('../emails/WelcomeEmail').default;
+const welcomeEmailTemplate = require('../emails/WelcomeEmail');
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const resolveReference = async (model, label, value) => {
     if (!value)
