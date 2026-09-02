@@ -24,3 +24,39 @@ export const useRegister = () => {
     mutationFn: (data) => authAPI.register(data),
   });
 };
+
+export const useDoctors = (departmentId) => {
+  return useQuery({
+    queryKey: ['doctors', departmentId],
+    queryFn: () => authAPI.getDoctors(departmentId),
+    enabled: Boolean(departmentId),
+  });
+};
+
+export const useDoctorsList = () => {
+  return useQuery({
+    queryKey: ['doctors', 'all'],
+    queryFn: () => authAPI.getDoctors(),
+  });
+};
+
+export const useNursesList = () => {
+  return useQuery({
+    queryKey: ['nurses'],
+    queryFn: () => authAPI.getNurses(),
+  });
+};
+
+export const useReceptionistsList = () => {
+  return useQuery({
+    queryKey: ['receptionists'],
+    queryFn: () => authAPI.getReceptionists(),
+  });
+};
+
+export const usePatientsList = () => {
+  return useQuery({
+    queryKey: ['patients'],
+    queryFn: () => authAPI.getPatients(),
+  });
+};

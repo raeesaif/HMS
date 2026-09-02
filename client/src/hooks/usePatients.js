@@ -1,30 +1,43 @@
-import { useEffect, useState } from 'react';
-import { fetchPatients } from '@/services/patientService';
+import { usePatientsList } from '@/hooks/useAuth';
+
+const formatDate = (value) => {
+  if (!value) return '—';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? '—'
+    : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const toReceptionPatient = (patient) => ({
+  id: patient._id,
+  userId: patient.userId,
+  firstName: patient.firstName,
+  lastName: patient.lastName,
+  name: `${patient.firstName} ${patient.lastName}`,
+  age: patient.age ?? '—',
+  gender: patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : '—',
+  phone: patient.phone ?? '—',
+  email: patient.email ?? '',
+  bloodGroup: patient.bloodGroup ?? '—',
+  department: patient.department,
+  doctor: patient.doctor,
+  patientStatus: patient.patientStatus,
+  admissionDate: patient.admissionDate,
+  lastVisit: '—',
+  registeredOn: formatDate(patient.createdAt),
+  status: patient.isActive ? 'Active' : 'Inactive',
+  address: patient.address ?? '',
+  identification: patient.identification ?? '',
+  emergencyContact: patient.emergencyContact ?? null,
+});
 
 export function usePatients() {
-  const [patients, setPatients] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, isLoading, isError, refetch } = usePatientsList();
 
-  const load = () => {
-    setIsLoading(true);
-    setError(null);
-    fetchPatients()
-      .then(setPatients)
-      .catch(() => setError('Unable to load patients.'))
-      .finally(() => setIsLoading(false));
+  return {
+    patients: (data ?? []).map(toReceptionPatient),
+    isLoading,
+    error: isError,
+    reload: refetch,
   };
-
-  useEffect(() => {
-    let active = true;
-    fetchPatients()
-      .then((data) => active && setPatients(data))
-      .catch(() => active && setError('Unable to load patients.'))
-      .finally(() => active && setIsLoading(false));
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  return { patients, setPatients, isLoading, error, reload: load };
 }

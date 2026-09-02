@@ -29,6 +29,7 @@ const ROLE_FIELDS = {
     ],
     [UserModel_1.Role.Nurse]: [
         'department',
+        'ward',
         'licenseNumber',
         'shiftStart',
         'shiftEnd',
@@ -38,6 +39,7 @@ const ROLE_FIELDS = {
     ],
     [UserModel_1.Role.Receptionist]: [
         'department',
+        'staffDepartment',
         'shiftStart',
         'shiftEnd',
         'dutyStatus',

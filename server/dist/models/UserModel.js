@@ -103,6 +103,18 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         trim: true,
     },
+    // Free-text desk/area assignment for receptionists (e.g. "Front Desk",
+    // "Emergency Reception") — distinct from `department`, which is a
+    // reference to the hospital's Department collection.
+    staffDepartment: {
+        type: String,
+        trim: true,
+    },
+    // Free-text ward/unit assignment for nurses (e.g. "ICU", "Ward 3").
+    ward: {
+        type: String,
+        trim: true,
+    },
     // Whether the staff member is clocked in at all.
     dutyStatus: {
         type: String,

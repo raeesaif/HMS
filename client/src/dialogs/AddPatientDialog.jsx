@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -46,6 +47,7 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
   const [open, setOpen] = useState(false);
   const { data: departments = [] } = useDepartments();
   const registerMutation = useRegister();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -63,6 +65,7 @@ const AddPatientDialog = ({ trigger, onAdd }) => {
       {
         onSuccess: (user) => {
           onAdd?.({ ...data, id: user.id, userId: user.userId });
+          queryClient.invalidateQueries({ queryKey: ['patients'] });
           toast.success(`${data.firstName} ${data.lastName} was added to patient records`);
           reset(getDefaultValues());
           setOpen(false);

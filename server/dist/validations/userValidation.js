@@ -42,6 +42,8 @@ const userSchema = zod_1.z
         .optional(),
     shiftStart: zod_1.z.string().optional(),
     shiftEnd: zod_1.z.string().optional(),
+    staffDepartment: zod_1.z.string().trim().optional(),
+    ward: zod_1.z.string().trim().optional(),
     dutyStatus: zod_1.z.enum(['On Duty', 'Off Duty']).optional(),
     availabilityStatus: zod_1.z.enum(['Available', 'Break', 'Busy']).optional(),
     gender: zod_1.z.enum(['male', 'female']).optional(),
@@ -126,6 +128,13 @@ const userSchema = zod_1.z
                 message: 'Department is required for nurses',
             });
         }
+        if (!data.ward) {
+            ctx.addIssue({
+                code: 'custom',
+                path: ['ward'],
+                message: 'Ward / unit is required for nurses',
+            });
+        }
         if (!data.licenseNumber) {
             ctx.addIssue({
                 code: 'custom',
@@ -149,11 +158,11 @@ const userSchema = zod_1.z
         }
     }
     if (data.role === 'receptionist') {
-        if (!data.department) {
+        if (!data.staffDepartment) {
             ctx.addIssue({
                 code: 'custom',
-                path: ['department'],
-                message: 'Department is required for receptionists',
+                path: ['staffDepartment'],
+                message: 'Staff department is required for receptionists',
             });
         }
         if (!data.shiftStart) {

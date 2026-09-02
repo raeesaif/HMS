@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -29,6 +30,7 @@ const getDefaultValues = () => ({
 
 const AddReceptionistDialog = ({ open, onOpenChange, onAdd }) => {
   const registerMutation = useRegister();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -46,6 +48,7 @@ const AddReceptionistDialog = ({ open, onOpenChange, onAdd }) => {
       {
         onSuccess: (user) => {
           onAdd?.({ ...data, id: user.id, userId: user.userId });
+          queryClient.invalidateQueries({ queryKey: ['receptionists'] });
           toast.success(`${data.firstName} ${data.lastName} was added to staff`);
           reset(getDefaultValues());
           onOpenChange?.(false);

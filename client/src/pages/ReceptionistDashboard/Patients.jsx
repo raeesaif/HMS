@@ -23,7 +23,7 @@ const PAGE_SIZE = 6;
 
 const Patients = () => {
   const navigate = useNavigate();
-  const { patients, setPatients, isLoading, error, reload } = usePatients();
+  const { patients, isLoading, error, reload } = usePatients();
 
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
@@ -76,14 +76,13 @@ const Patients = () => {
     if (!next) setOpenDialog(null);
   };
 
-  const handleRegister = (newPatient) => {
-    setPatients((current) => [newPatient, ...current]);
+  const handleRegister = () => {
+    // AddPatientDialog already invalidates the ['patients'] query on success,
+    // which refetches this list — nothing to do here.
   };
 
   const handleEditSave = (patientId, payload) => {
-    updatePatientService(patientId, payload).then(() => {
-      setPatients((current) => current.map((patient) => (patient.id === patientId ? { ...patient, ...payload } : patient)));
-    });
+    updatePatientService(patientId, payload);
   };
 
   const handleCreateAppointment = (payload) => {

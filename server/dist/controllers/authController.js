@@ -10,7 +10,8 @@ const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const sanitizeUser_1 = __importDefault(require("../utils/sanitizeUser"));
 const appError_1 = __importDefault(require("../utils/appError"));
 const register = (0, catchAsync_1.default)(async (req, res) => {
-    const user = await (0, authService_1.registerUser)(req.body);
+    const hospitalId = req.user?.hospitalId;
+    const user = await (0, authService_1.registerUser)({ ...req.body, ...(hospitalId && { hospitalId: String(hospitalId) }) });
     apiResponse_1.default.success(res, user, 'User created successfully', 201);
 });
 exports.register = register;
