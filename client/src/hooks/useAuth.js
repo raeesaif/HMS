@@ -60,3 +60,10 @@ export const usePatientsList = () => {
     queryFn: () => authAPI.getPatients(),
   });
 };
+
+export const useUpdatePassword = () => {
+  return useMutation({
+    mutationKey: ['update-password'],
+    mutationFn: (data) => authAPI.updatePassword(data),
+  });
+};

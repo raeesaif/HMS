@@ -30,4 +30,8 @@ export const authAPI = {
     const response = await apiClient.get('/auth/patients');
     return response.data.data;
   },
+  updatePassword: async (data) => {
+    const response = await apiClient.patch('/auth/update-password', data);
+    return response.data.data;
+  },
 };

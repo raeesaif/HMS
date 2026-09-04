@@ -277,9 +277,32 @@ const updateAvailabilityStatus = async (
   return sanitizeUser(user);
 };
 
+
+const updatePassword = async (userId: string, currentPassword: string, newPassword: string) => {
+  const user = await UserModel.findById(userId).select('+password');
+
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  const isMatch = await comparePassword(currentPassword, user.password);
+
+  if (!isMatch) {
+    throw new AppError(400, 'Current password is incorrect');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+  user.password = hashedPassword;
+  await user.save();
+
+  return sanitizeUser(user);
+};
+
+
 export {
   registerUser,
   loginService,
   updateDutyStatus,
   updateAvailabilityStatus,
+  updatePassword,
 };

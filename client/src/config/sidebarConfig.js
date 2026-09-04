@@ -49,6 +49,7 @@ export const roleNavigation = {
     { icon: Receipt, name: 'Billing', path: '/admin/billing' },
     { icon: Pill, name: 'Pharmacy', path: '/admin/pharmacy' },
     { icon: BarChart3, name: 'Reports', path: '/admin/reports' },
+    { icon: Settings, name: 'Settings', path: '/admin/settings' },
   ],
   doctor: [
     { icon: LayoutDashboard, name: 'Dashboard', path: '/doctor/dashboard' },

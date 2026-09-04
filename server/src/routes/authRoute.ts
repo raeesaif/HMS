@@ -8,7 +8,8 @@ import {
   getDoctorsController,
   getPatientController,
   getNurseController,
-   getReceptionistController
+  getReceptionistController,
+  updatePasswordController
 } from '@src/controllers/authController';
 import userSchema, {
   loginSchema,
@@ -65,6 +66,13 @@ authRouter.patch(
   restrictMiddleware('doctor', 'nurse', 'receptionist'),
   validateSchemaPayload(updateAvailabilityStatusSchema),
   updateAvailabilityStatusController
+);
+
+authRouter.patch(
+  '/update-password',
+  authMiddleware,
+  restrictMiddleware('doctor', 'nurse', 'receptionist', 'admin', 'patient'),
+  updatePasswordController
 );
 
 export default authRouter;

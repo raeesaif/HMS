@@ -12,6 +12,7 @@ import {
 import { FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useUpdatePassword } from '@/hooks/useAuth';
 
 function getPasswordStrength(password) {
   if (!password) return { label: '', className: '' };
@@ -42,6 +43,7 @@ function PasswordForm({ onOpenChange, onSave }) {
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [errors, setErrors] = useState({});
   const strength = getPasswordStrength(form.newPassword);
+  const updatePasswordMutation = useUpdatePassword();
 
   const updateField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
@@ -50,9 +52,19 @@ function PasswordForm({ onOpenChange, onSave }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    onSave();
-    onOpenChange(false);
-    toast.success('Password changed successfully.');
+    updatePasswordMutation.mutate(
+      { currentPassword: form.currentPassword, newPassword: form.newPassword },
+      {
+        onSuccess: () => {
+          onSave?.();
+          onOpenChange(false);
+          toast.success('Password changed successfully.');
+        },
+        onError: (error) => {
+          setErrors({ currentPassword: error.response?.data?.message ?? 'Failed to update password' });
+        },
+      }
+    );
   };
 
   return (
@@ -83,7 +95,9 @@ function PasswordForm({ onOpenChange, onSave }) {
 
       <DialogFooter>
         <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
-        <Button onClick={handleSave}>Update Password</Button>
+        <Button onClick={handleSave} disabled={updatePasswordMutation.isPending}>
+          {updatePasswordMutation.isPending ? 'Updating…' : 'Update Password'}
+        </Button>
       </DialogFooter>
     </>
   );

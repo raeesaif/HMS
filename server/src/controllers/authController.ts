@@ -4,6 +4,7 @@ import {
   loginService,
   updateDutyStatus,
   updateAvailabilityStatus,
+  updatePassword
 } from '@src/services/authService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
@@ -123,12 +124,20 @@ const getReceptionistController = catchAsync(
   }
 )
 
+const updatePasswordController = catchAsync(
+  async(req:Request,res:Response):Promise<void>=>{
+    const password = await updatePassword(String(req.user?._id), req.body.currentPassword, req.body.newPassword);
+    apiResponse.success(res, password, 'Password updated successfully', 200);
+  }
+)
+
 export {
   register,
   login,
   meController,
   updateDutyStatusController,
   updateAvailabilityStatusController,
+  updatePasswordController,
   getDoctorsController,
   getPatientController,
   getNurseController,

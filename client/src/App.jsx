@@ -12,6 +12,7 @@ import AdminBeds from './pages/AdminDashboard/AdminBeds';
 import AdminBilling from './pages/AdminDashboard/AdminBilling';
 import AdminPharmacy from './pages/AdminDashboard/AdminPharmacy';
 import AdminReports from './pages/AdminDashboard/AdminReports';
+import AdminSettings from './pages/AdminDashboard/Settings';
 import NurseDashboard from './pages/NurseDashboard/NurseDashboard';
 import AssignedPatients from './pages/NurseDashboard/AssignedPatients';
 import VitalsMonitoring from './pages/NurseDashboard/VitalsMonitoring';
@@ -86,6 +87,7 @@ const App = () => {
             <Route path="/admin/billing" element={<AdminBilling />} />
             <Route path="/admin/pharmacy" element={<AdminPharmacy />} />
             <Route path="/admin/reports" element={<AdminReports />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             {/* Nurse Dashboard */}
             <Route path="/nurse/dashboard" element={<NurseDashboard />} />
             <Route path="/nurse/patients" element={<AssignedPatients />} />

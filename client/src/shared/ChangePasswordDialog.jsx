@@ -12,12 +12,14 @@ import {
 import { FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useUpdatePassword } from '@/hooks/useAuth';
 
 const emptyForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
 function ChangePasswordForm({ onOpenChange, onSubmit }) {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
+  const updatePasswordMutation = useUpdatePassword();
 
   const updateField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
@@ -37,9 +39,19 @@ function ChangePasswordForm({ onOpenChange, onSubmit }) {
     }
 
     setError('');
-    onSubmit?.();
-    toast.success('Password updated successfully');
-    onOpenChange(false);
+    updatePasswordMutation.mutate(
+      { currentPassword: form.currentPassword, newPassword: form.newPassword },
+      {
+        onSuccess: () => {
+          onSubmit?.();
+          toast.success('Password updated successfully');
+          onOpenChange(false);
+        },
+        onError: (err) => {
+          setError(err.response?.data?.message ?? 'Failed to update password');
+        },
+      }
+    );
   };
 
   return (
@@ -70,7 +82,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit }) {
           <DialogDescription>Choose a strong password you haven't used before.</DialogDescription>
         </DialogHeader>
 
-        <ChangePasswordForm onOpenChange={onOpenChange} onSubmit={onSubmit} />
+        <ChangePasswordForm key={open ? 'open' : 'closed'} onOpenChange={onOpenChange} onSubmit={onSubmit} />
 
         <DialogFooter>
           <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
