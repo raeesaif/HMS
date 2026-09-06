@@ -1,4 +1,11 @@
-const welcomeEmailTemplate = (firstname, email, role, password, loginUrl) => `
+const welcomeEmailTemplate = (
+  firstname,
+  lastName,
+  email,
+  role,
+  password,
+  loginUrl
+) => `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -31,7 +38,7 @@ const welcomeEmailTemplate = (firstname, email, role, password, loginUrl) => `
           <tr>
             <td style="padding:40px 40px 32px;">
               <h1 style="font-size:22px;font-weight:700;color:#1E293B;margin:0 0 12px;line-height:1.3;">
-                Welcome aboard, ${firstname} 🎉
+                Welcome aboard, ${firstname} ${lastName} 🎉
               </h1>
               <p style="font-size:15px;color:#475569;line-height:1.7;margin:0 0 28px;">
                 Your account has been successfully created on the Hospital Management System.
@@ -45,7 +52,7 @@ const welcomeEmailTemplate = (firstname, email, role, password, loginUrl) => `
                       <tr>
                         <td style="padding:8px 0;border-bottom:1px solid #E2E8F0;">
                           <p style="font-size:12px;color:#64748B;margin:0 0 2px;text-transform:uppercase;letter-spacing:0.5px;">Full Name</p>
-                          <p style="font-size:15px;color:#1E293B;font-weight:600;margin:0;">${firstname}</p>
+                          <p style="font-size:15px;color:#1E293B;font-weight:600;margin:0;">${firstname} ${lastName}</p>
                         </td>
                       </tr>
                       <tr>

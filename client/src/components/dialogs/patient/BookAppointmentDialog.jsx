@@ -12,7 +12,13 @@ import {
 import { FieldLabel, FieldError } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { appointmentTypeOptions } from '@/data/patientAppointments';
 import { departmentOptions, doctors } from '@/data/patientDoctors';
 
@@ -23,13 +29,18 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
   const [time, setTime] = useState('');
   const [type, setType] = useState('');
   const [reasonForVisit, setReasonForVisit] = useState('');
-  const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState({});
 
-  const doctorsInDepartment = department ? doctors.filter((doctor) => doctor.department === department) : [];
-  const selectedDoctor = doctors.find((doctor) => doctor.id === doctorId) ?? null;
-  const availableDates = selectedDoctor ? Object.keys(selectedDoctor.availableSlots) : [];
-  const availableTimes = selectedDoctor && date ? (selectedDoctor.availableSlots[date] ?? []) : [];
+  const doctorsInDepartment = department
+    ? doctors.filter((doctor) => doctor.department === department)
+    : [];
+  const selectedDoctor =
+    doctors.find((doctor) => doctor.id === doctorId) ?? null;
+  const availableDates = selectedDoctor
+    ? Object.keys(selectedDoctor.availableSlots)
+    : [];
+  const availableTimes =
+    selectedDoctor && date ? (selectedDoctor.availableSlots[date] ?? []) : [];
 
   const handleSave = () => {
     const nextErrors = {};
@@ -38,12 +49,19 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
     if (!date) nextErrors.date = 'Select an available date';
     if (!time) nextErrors.time = 'Select an available time';
     if (!type) nextErrors.type = 'Select an appointment type';
-    if (!reasonForVisit.trim()) nextErrors.reasonForVisit = 'Reason for visit is required';
+    if (!reasonForVisit.trim())
+      nextErrors.reasonForVisit = 'Reason for visit is required';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    onSave({ doctorId, date, time, type, reasonForVisit: reasonForVisit.trim(), notes: notes.trim() });
+    onSave({
+      doctorId,
+      date,
+      time,
+      type,
+      reasonForVisit: reasonForVisit.trim(),
+    });
     onOpenChange(false);
     toast.success('Appointment request submitted');
   };
@@ -63,7 +81,10 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
                 setTime('');
               }}
             >
-              <SelectTrigger className="w-full" aria-invalid={!!errors.department}>
+              <SelectTrigger
+                className="w-full"
+                aria-invalid={!!errors.department}
+              >
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
               <SelectContent>
@@ -88,8 +109,15 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
               }}
               disabled={!department}
             >
-              <SelectTrigger className="w-full" aria-invalid={!!errors.doctorId}>
-                <SelectValue placeholder={department ? 'Select doctor' : 'Select a department first'} />
+              <SelectTrigger
+                className="w-full"
+                aria-invalid={!!errors.doctorId}
+              >
+                <SelectValue
+                  placeholder={
+                    department ? 'Select doctor' : 'Select a department first'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {doctorsInDepartment.map((doctor) => (
@@ -113,7 +141,11 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
               disabled={!doctorId}
             >
               <SelectTrigger className="w-full" aria-invalid={!!errors.date}>
-                <SelectValue placeholder={doctorId ? 'Select date' : 'Select a doctor first'} />
+                <SelectValue
+                  placeholder={
+                    doctorId ? 'Select date' : 'Select a doctor first'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {availableDates.map((option) => (
@@ -125,7 +157,9 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
             </Select>
             {errors.date && <FieldError>{errors.date}</FieldError>}
             {doctorId && availableDates.length === 0 && (
-              <p className="text-xs text-slate-400">No available dates for this doctor right now.</p>
+              <p className="text-xs text-slate-400">
+                No available dates for this doctor right now.
+              </p>
             )}
           </div>
 
@@ -133,7 +167,9 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
             <FieldLabel>Available Time *</FieldLabel>
             <Select value={time} onValueChange={setTime} disabled={!date}>
               <SelectTrigger className="w-full" aria-invalid={!!errors.time}>
-                <SelectValue placeholder={date ? 'Select time' : 'Select a date first'} />
+                <SelectValue
+                  placeholder={date ? 'Select time' : 'Select a date first'}
+                />
               </SelectTrigger>
               <SelectContent>
                 {availableTimes.map((option) => (
@@ -172,17 +208,16 @@ function BookAppointmentForm({ onOpenChange, onSave }) {
             className="min-h-16 resize-none"
             aria-invalid={!!errors.reasonForVisit}
           />
-          {errors.reasonForVisit && <FieldError>{errors.reasonForVisit}</FieldError>}
-        </div>
-
-        <div className="space-y-1">
-          <FieldLabel>Notes</FieldLabel>
-          <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} className="min-h-16 resize-none" placeholder="Optional notes for your doctor..." />
+          {errors.reasonForVisit && (
+            <FieldError>{errors.reasonForVisit}</FieldError>
+          )}
         </div>
       </div>
 
       <DialogFooter>
-        <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+        <DialogClose render={<Button type="button" variant="outline" />}>
+          Cancel
+        </DialogClose>
         <Button onClick={handleSave}>Book Appointment</Button>
       </DialogFooter>
     </>
@@ -195,10 +230,16 @@ export function BookAppointmentDialog({ open, onOpenChange, onSave }) {
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Book Appointment</DialogTitle>
-          <DialogDescription>Only currently available doctor slots can be selected.</DialogDescription>
+          <DialogDescription>
+            Only currently available doctor slots can be selected.
+          </DialogDescription>
         </DialogHeader>
 
-        <BookAppointmentForm key={open ? 'open' : 'closed'} onOpenChange={onOpenChange} onSave={onSave} />
+        <BookAppointmentForm
+          key={open ? 'open' : 'closed'}
+          onOpenChange={onOpenChange}
+          onSave={onSave}
+        />
       </DialogContent>
     </Dialog>
   );

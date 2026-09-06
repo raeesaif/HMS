@@ -13,28 +13,47 @@ import { FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { PatientSelect } from '@/components/reception/PatientSelect';
 import { PatientAvatar } from '@/components/reception/PatientAvatar';
 import { ReceptionDatePicker } from '@/components/reception/ReceptionDatePicker';
-import { appointmentPriorityOptions, appointmentTypeOptions } from '@/data/receptionistAppointments';
+import {
+  appointmentPriorityOptions,
+  appointmentTypeOptions,
+} from '@/data/receptionistAppointments';
 import { doctorsOnDuty, getDoctorById } from '@/data/receptionistDoctors';
 import { getPatientById } from '@/data/receptionistPatients';
 
-function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) {
+function AppointmentForm({
+  appointment,
+  initialPatient,
+  onOpenChange,
+  onSave,
+}) {
   const isReschedule = !!appointment;
-  const existingPatient = isReschedule ? getPatientById(appointment.patientId) : null;
+  const existingPatient = isReschedule
+    ? getPatientById(appointment.patientId)
+    : null;
 
-  const [patient, setPatient] = useState(existingPatient ?? initialPatient ?? null);
+  const [patient, setPatient] = useState(
+    existingPatient ?? initialPatient ?? null
+  );
   const [doctorId, setDoctorId] = useState(appointment?.doctorId ?? '');
   const [date, setDate] = useState(appointment?.date ?? '');
   const [time, setTime] = useState(appointment?.time ?? '');
   const [type, setType] = useState(appointment?.type ?? '');
   const [priority, setPriority] = useState(appointment?.priority ?? 'Normal');
-  const [reasonForVisit, setReasonForVisit] = useState(appointment?.reasonForVisit ?? '');
-  const [notes, setNotes] = useState(appointment?.notes ?? '');
+  const [reasonForVisit, setReasonForVisit] = useState(
+    appointment?.reasonForVisit ?? ''
+  );
   const [errors, setErrors] = useState({});
 
   const selectedDoctor = getDoctorById(doctorId);
@@ -46,13 +65,14 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
     if (!date) nextErrors.date = 'Select a date';
     if (!time.trim()) nextErrors.time = 'Enter an appointment time';
     if (!isReschedule && !type) nextErrors.type = 'Select an appointment type';
-    if (!isReschedule && !reasonForVisit.trim()) nextErrors.reasonForVisit = 'Reason for visit is required';
+    if (!isReschedule && !reasonForVisit.trim())
+      nextErrors.reasonForVisit = 'Reason for visit is required';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
     if (isReschedule) {
-      onSave(appointment.id, { date, time, notes: notes.trim() });
+      onSave(appointment.id, { date, time });
       toast.success('Appointment rescheduled');
     } else {
       onSave({
@@ -63,7 +83,6 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
         type,
         priority,
         reasonForVisit: reasonForVisit.trim(),
-        notes: notes.trim(),
       });
       toast.success('Appointment created');
     }
@@ -78,7 +97,9 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
           {isReschedule ? (
             <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
               <PatientAvatar name={existingPatient?.name ?? ''} />
-              <p className="text-sm font-medium text-slate-900">{existingPatient?.name ?? appointment.patientName}</p>
+              <p className="text-sm font-medium text-slate-900">
+                {existingPatient?.name ?? appointment.patientName}
+              </p>
             </div>
           ) : (
             <PatientSelect selectedPatient={patient} onChange={setPatient} />
@@ -89,8 +110,15 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1">
             <FieldLabel>Doctor *</FieldLabel>
-            <Select value={doctorId} onValueChange={setDoctorId} disabled={isReschedule}>
-              <SelectTrigger className="w-full" aria-invalid={!!errors.doctorId}>
+            <Select
+              value={doctorId}
+              onValueChange={setDoctorId}
+              disabled={isReschedule}
+            >
+              <SelectTrigger
+                className="w-full"
+                aria-invalid={!!errors.doctorId}
+              >
                 <SelectValue placeholder="Select doctor" />
               </SelectTrigger>
               <SelectContent>
@@ -105,7 +133,11 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
           </div>
           <div className="space-y-1">
             <FieldLabel>Department</FieldLabel>
-            <Input value={selectedDoctor?.department ?? ''} disabled placeholder="Auto-filled from doctor" />
+            <Input
+              value={selectedDoctor?.department ?? ''}
+              disabled
+              placeholder="Auto-filled from doctor"
+            />
           </div>
           <div className="space-y-1">
             <FieldLabel>Appointment Date *</FieldLabel>
@@ -114,7 +146,12 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
           </div>
           <div className="space-y-1">
             <FieldLabel>Appointment Time *</FieldLabel>
-            <Input value={time} onChange={(event) => setTime(event.target.value)} placeholder="e.g. 10:30 AM" aria-invalid={!!errors.time} />
+            <Input
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
+              placeholder="e.g. 10:30 AM"
+              aria-invalid={!!errors.time}
+            />
             {errors.time && <FieldError>{errors.time}</FieldError>}
           </div>
           {!isReschedule && (
@@ -141,9 +178,16 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
           <>
             <div className="space-y-1">
               <FieldLabel>Priority</FieldLabel>
-              <RadioGroup value={priority} onValueChange={setPriority} className="flex flex-wrap gap-4">
+              <RadioGroup
+                value={priority}
+                onValueChange={setPriority}
+                className="flex flex-wrap gap-4"
+              >
                 {appointmentPriorityOptions.map((option) => (
-                  <Label key={option} className="flex items-center gap-2 text-sm font-normal">
+                  <Label
+                    key={option}
+                    className="flex items-center gap-2 text-sm font-normal"
+                  >
                     <RadioGroupItem value={option} />
                     {option}
                   </Label>
@@ -159,31 +203,40 @@ function AppointmentForm({ appointment, initialPatient, onOpenChange, onSave }) 
                 className="min-h-16 resize-none"
                 aria-invalid={!!errors.reasonForVisit}
               />
-              {errors.reasonForVisit && <FieldError>{errors.reasonForVisit}</FieldError>}
+              {errors.reasonForVisit && (
+                <FieldError>{errors.reasonForVisit}</FieldError>
+              )}
             </div>
           </>
         )}
-
-        <div className="space-y-1">
-          <FieldLabel>Notes</FieldLabel>
-          <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} className="min-h-16 resize-none" placeholder="Optional notes for the front desk..." />
-        </div>
       </div>
 
       <DialogFooter>
-        <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
-        <Button onClick={handleSave}>{isReschedule ? 'Save New Time' : 'Create Appointment'}</Button>
+        <DialogClose render={<Button type="button" variant="outline" />}>
+          Cancel
+        </DialogClose>
+        <Button onClick={handleSave}>
+          {isReschedule ? 'Save New Time' : 'Create Appointment'}
+        </Button>
       </DialogFooter>
     </>
   );
 }
 
-export function AppointmentDialog({ appointment = null, initialPatient = null, open, onOpenChange, onSave }) {
+export function AppointmentDialog({
+  appointment = null,
+  initialPatient = null,
+  open,
+  onOpenChange,
+  onSave,
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{appointment ? 'Reschedule Appointment' : 'Create Appointment'}</DialogTitle>
+          <DialogTitle>
+            {appointment ? 'Reschedule Appointment' : 'Create Appointment'}
+          </DialogTitle>
           <DialogDescription>
             {appointment
               ? `Choose a new date and time for ${appointment.patientName}.`
@@ -192,7 +245,13 @@ export function AppointmentDialog({ appointment = null, initialPatient = null, o
         </DialogHeader>
 
         <AppointmentForm
-          key={appointment ? appointment.id : open ? `new-open-${initialPatient?.id ?? ''}` : 'new-closed'}
+          key={
+            appointment
+              ? appointment.id
+              : open
+                ? `new-open-${initialPatient?.id ?? ''}`
+                : 'new-closed'
+          }
           appointment={appointment}
           initialPatient={initialPatient}
           onOpenChange={onOpenChange}

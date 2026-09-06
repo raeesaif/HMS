@@ -52,7 +52,6 @@ type RegisterUserData = {
   doctor?: string;
   admissionDate?: Date;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-
 };
 
 const escapeRegExp = (value: string): string =>
@@ -181,6 +180,7 @@ const registerUser = async (userData: RegisterUserData) => {
 
     html: welcomeEmailTemplate(
       user.firstName,
+      user.lastName,
       user.email,
       user.role,
       rawPassword,
@@ -277,8 +277,11 @@ const updateAvailabilityStatus = async (
   return sanitizeUser(user);
 };
 
-
-const updatePassword = async (userId: string, currentPassword: string, newPassword: string) => {
+const updatePassword = async (
+  userId: string,
+  currentPassword: string,
+  newPassword: string
+) => {
   const user = await UserModel.findById(userId).select('+password');
 
   if (!user) {
@@ -297,7 +300,6 @@ const updatePassword = async (userId: string, currentPassword: string, newPasswo
 
   return sanitizeUser(user);
 };
-
 
 export {
   registerUser,
