@@ -67,3 +67,17 @@ export const useUpdatePassword = () => {
     mutationFn: (data) => authAPI.updatePassword(data),
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationKey: ['forgot-password'],
+    mutationFn: (data) => authAPI.forgotPassword(data),
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationKey: ['reset-password'],
+    mutationFn: (data) => authAPI.resetPassword(data),
+  });
+};

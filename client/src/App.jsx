@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AuthLayout from './layouts/AuthLayout';
 import Login from './auth/Login';
 import ForgetPassword from './auth/ForgetPassword';
+import ResetPassword from './auth/ResetPassword';
 import Home from './pages/home/Home';
 import { MainLayout } from './layouts/MainLayout';
 import Dashboard from './pages/AdminDashboard/Dashboard';
@@ -77,6 +78,7 @@ const App = () => {
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
           <Route element={<MainLayout />}>
             <Route path="/admin/dashboard" element={<Dashboard />} />

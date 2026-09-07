@@ -4,7 +4,9 @@ import {
   loginService,
   updateDutyStatus,
   updateAvailabilityStatus,
-  updatePassword
+  updatePassword,
+  forgetPassword,
+  resetPassword,
 } from '@src/services/authService';
 import apiResponse from '@src/utils/apiResponse';
 import catchAsync from '@src/utils/catchAsync';
@@ -116,20 +118,52 @@ const getNurseController = catchAsync(
 );
 
 const getReceptionistController = catchAsync(
-  async(req:Request, res:Response):Promise<void>=>{
+  async (req: Request, res: Response): Promise<void> => {
     const hospitalId = (req as any).user?.hospitalId;
-    const filter:any = {role:Role.Receptionist, hospitalId};
+    const filter: any = { role: Role.Receptionist, hospitalId };
     const receptionist = await UserModel.find(filter);
-    apiResponse.success(res, receptionist, 'Receptionist fetched successfully', 200);
+    apiResponse.success(
+      res,
+      receptionist,
+      'Receptionist fetched successfully',
+      200
+    );
   }
-)
+);
 
 const updatePasswordController = catchAsync(
-  async(req:Request,res:Response):Promise<void>=>{
-    const password = await updatePassword(String(req.user?._id), req.body.currentPassword, req.body.newPassword);
+  async (req: Request, res: Response): Promise<void> => {
+    const password = await updatePassword(
+      String(req.user?._id),
+      req.body.currentPassword,
+      req.body.newPassword
+    );
     apiResponse.success(res, password, 'Password updated successfully', 200);
   }
-)
+);
+
+const forgetPasswordController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const result = await forgetPassword(req.body.email);
+    apiResponse.success(
+      res,
+      result,
+      'Password reset email sent successfully',
+      200
+    );
+  }
+);
+
+const resetPasswordController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const result = await resetPassword(
+      req.body.email,
+      req.body.token,
+      req.body.newPassword
+    );
+    apiResponse.success(res, result, 'Password reset successfully', 200);
+  }
+);
 
 export {
   register,
@@ -141,6 +175,7 @@ export {
   getDoctorsController,
   getPatientController,
   getNurseController,
-  getReceptionistController
-
+  getReceptionistController,
+  forgetPasswordController,
+  resetPasswordController
 };

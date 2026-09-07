@@ -9,7 +9,9 @@ import {
   getPatientController,
   getNurseController,
   getReceptionistController,
-  updatePasswordController
+  updatePasswordController,
+  forgetPasswordController,
+  resetPasswordController,
 } from '@src/controllers/authController';
 import userSchema, {
   loginSchema,
@@ -74,5 +76,8 @@ authRouter.patch(
   restrictMiddleware('doctor', 'nurse', 'receptionist', 'admin', 'patient'),
   updatePasswordController
 );
+
+authRouter.post('/forgot-password', forgetPasswordController);
+authRouter.post('/reset-password', resetPasswordController);
 
 export default authRouter;

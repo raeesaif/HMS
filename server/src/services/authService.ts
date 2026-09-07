@@ -11,13 +11,12 @@ import {
   generateStaffId,
 } from '@src/utils/helper';
 import { loginAccessToken, loginRefreshToken } from '@src/utils/jwt';
-
 import sendEmail from '@src/utils/sendEmail';
 import AppError from '@src/utils/appError';
 import sanitizeUser from '@src/utils/sanitizeUser';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const welcomeEmailTemplate = require('@src/emails/WelcomeEmail');
-
+const resetPasswordEmailTemplate = require('@src/emails/ResetPasswordEmail');
 type RegisterUserData = {
   firstName: string;
   lastName: string;
@@ -301,10 +300,94 @@ const updatePassword = async (
   return sanitizeUser(user);
 };
 
+const forgetPassword = async (email: string) => {
+  const user = await UserModel.findOne({
+    email: email.toLowerCase(),
+  });
+
+  const genericResponse = {
+    message:
+      'If an account exists with this email, you will receive a password reset link.',
+  };
+
+  // Never let the caller distinguish "no such email" from "email sent" —
+  // return the same generic response either way.
+  if (!user) {
+    return genericResponse;
+  }
+
+  // =================================
+  // Generate & persist reset token
+  // =================================
+
+  const resetToken = generateRandomString(32);
+  const resetTokenHash = await hashPassword(resetToken);
+
+  user.resetPasswordTokenHash = resetTokenHash;
+  user.resetPasswordTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  await user.save();
+
+  // =================================
+  // Build reset URL
+  // =================================
+
+  const forgetUrl = `${process.env.FRONTEND_URL}/reset-password?email=${encodeURIComponent(
+    user.email
+  )}&token=${encodeURIComponent(resetToken)}`;
+
+  // =================================
+  // Send Reset Password Email
+  // =================================
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Reset Your Password',
+    html: resetPasswordEmailTemplate(user.firstName, user.lastName, forgetUrl),
+  });
+
+  return genericResponse;
+};
+
+
+const resetPassword = async (email: string, token: string, newPassword: string) => {
+  const user = await UserModel.findOne({
+    email: email.toLowerCase(),
+  }).select('+resetPasswordTokenHash +resetPasswordTokenExpiry');
+
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  if (!user.resetPasswordTokenHash) {
+    throw new AppError(400, 'Invalid reset token');
+  }
+
+  const isMatch = await comparePassword(token, user.resetPasswordTokenHash);
+
+  if (!isMatch) {
+    throw new AppError(400, 'Invalid reset token');
+  }
+
+  if (user.resetPasswordTokenExpiry < new Date()) {
+    throw new AppError(400, 'Reset token has expired');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+  user.password = hashedPassword;
+  user.resetPasswordTokenHash = undefined;
+  user.resetPasswordTokenExpiry = undefined;
+  await user.save();
+
+  return sanitizeUser(user);
+};
+
+
 export {
   registerUser,
   loginService,
   updateDutyStatus,
   updateAvailabilityStatus,
   updatePassword,
+  forgetPassword,
+  resetPassword,
 };

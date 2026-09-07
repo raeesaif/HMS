@@ -1,4 +1,4 @@
-const resetPasswordEmailTemplate = (firstname, resetTokenUrl) => `
+const resetPasswordEmailTemplate = (firstname, lastName, resetTokenUrl) => `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -34,7 +34,7 @@ const resetPasswordEmailTemplate = (firstname, resetTokenUrl) => `
                 Reset your password 🔒
               </h1>
               <p style="font-size:15px;color:#475569;line-height:1.7;margin:0 0 32px;">
-                Hello <strong style="color:#1E293B;">${firstname}</strong>, we received a request to reset the password
+                Hello <strong style="color:#1E293B;">${firstname} ${lastName}</strong>, we received a request to reset the password
                 for your HMS account. Click the button below to choose a new password.
               </p>
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8FAFC;border:2px solid #0077B6;border-radius:12px;margin-bottom:10px;">

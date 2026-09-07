@@ -217,17 +217,26 @@ const UserSchema = new Schema(
     // Email Verification
     // =========================
 
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-
     verificationTokenHash: {
       type: String,
       select: false,
     },
 
     verificationTokenExpiry: {
+      type: Date,
+      select: false,
+    },
+
+    // =========================
+    // Password Reset
+    // =========================
+
+    resetPasswordTokenHash: {
+      type: String,
+      select: false,
+    },
+
+    resetPasswordTokenExpiry: {
       type: Date,
       select: false,
     },
@@ -240,11 +249,11 @@ const UserSchema = new Schema(
       type: String,
       select: false,
     },
-    hospitalId:{
-      type:Schema.Types.ObjectId,
-       ref: "Hospital",
-      default:null
-    }
+    hospitalId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Hospital',
+      default: null,
+    },
   },
   {
     timestamps: true,
