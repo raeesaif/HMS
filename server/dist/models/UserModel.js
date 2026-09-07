@@ -184,15 +184,22 @@ const UserSchema = new mongoose_1.Schema({
     // =========================
     // Email Verification
     // =========================
-    isVerified: {
-        type: Boolean,
-        default: false,
-    },
     verificationTokenHash: {
         type: String,
         select: false,
     },
     verificationTokenExpiry: {
+        type: Date,
+        select: false,
+    },
+    // =========================
+    // Password Reset
+    // =========================
+    resetPasswordTokenHash: {
+        type: String,
+        select: false,
+    },
+    resetPasswordTokenExpiry: {
         type: Date,
         select: false,
     },
@@ -205,9 +212,9 @@ const UserSchema = new mongoose_1.Schema({
     },
     hospitalId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Hospital",
-        default: null
-    }
+        ref: 'Hospital',
+        default: null,
+    },
 }, {
     timestamps: true,
 });

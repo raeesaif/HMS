@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAvailabilityStatus = exports.updateDutyStatus = exports.loginService = exports.registerUser = void 0;
+exports.resetPassword = exports.forgetPassword = exports.updatePassword = exports.updateAvailabilityStatus = exports.updateDutyStatus = exports.loginService = exports.registerUser = void 0;
 const mongoose_1 = require("mongoose");
 const UserModel_1 = __importDefault(require("../models/UserModel"));
 const UserModel_2 = require("../models/UserModel");
@@ -16,6 +16,7 @@ const appError_1 = __importDefault(require("../utils/appError"));
 const sanitizeUser_1 = __importDefault(require("../utils/sanitizeUser"));
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const welcomeEmailTemplate = require('../emails/WelcomeEmail');
+const resetPasswordEmailTemplate = require('../emails/ResetPasswordEmail');
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const resolveReference = async (model, label, value) => {
     if (!value)
@@ -96,7 +97,7 @@ const registerUser = async (userData) => {
     await (0, sendEmail_1.default)({
         to: user.email,
         subject: 'Welcome to HMS - Your Account is Ready',
-        html: welcomeEmailTemplate(user.firstName, user.email, user.role, rawPassword, loginUrl),
+        html: welcomeEmailTemplate(user.firstName, user.lastName, user.email, user.role, rawPassword, loginUrl),
     });
     // =================================
     // Return Safe User Data
@@ -158,3 +159,78 @@ const updateAvailabilityStatus = async (userId, availabilityStatus) => {
     return (0, sanitizeUser_1.default)(user);
 };
 exports.updateAvailabilityStatus = updateAvailabilityStatus;
+const updatePassword = async (userId, currentPassword, newPassword) => {
+    const user = await UserModel_1.default.findById(userId).select('+password');
+    if (!user) {
+        throw new appError_1.default(404, 'User not found');
+    }
+    const isMatch = await (0, helper_1.comparePassword)(currentPassword, user.password);
+    if (!isMatch) {
+        throw new appError_1.default(400, 'Current password is incorrect');
+    }
+    const hashedPassword = await (0, helper_1.hashPassword)(newPassword);
+    user.password = hashedPassword;
+    await user.save();
+    return (0, sanitizeUser_1.default)(user);
+};
+exports.updatePassword = updatePassword;
+const forgetPassword = async (email) => {
+    const user = await UserModel_1.default.findOne({
+        email: email.toLowerCase(),
+    });
+    const genericResponse = {
+        message: 'If an account exists with this email, you will receive a password reset link.',
+    };
+    // Never let the caller distinguish "no such email" from "email sent" —
+    // return the same generic response either way.
+    if (!user) {
+        return genericResponse;
+    }
+    // =================================
+    // Generate & persist reset token
+    // =================================
+    const resetToken = (0, helper_1.generateRandomString)(32);
+    const resetTokenHash = await (0, helper_1.hashPassword)(resetToken);
+    user.resetPasswordTokenHash = resetTokenHash;
+    user.resetPasswordTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+    // =================================
+    // Build reset URL
+    // =================================
+    const forgetUrl = `${process.env.FRONTEND_URL}/reset-password?email=${encodeURIComponent(user.email)}&token=${encodeURIComponent(resetToken)}`;
+    // =================================
+    // Send Reset Password Email
+    // =================================
+    await (0, sendEmail_1.default)({
+        to: user.email,
+        subject: 'Reset Your Password',
+        html: resetPasswordEmailTemplate(user.firstName, user.lastName, forgetUrl),
+    });
+    return genericResponse;
+};
+exports.forgetPassword = forgetPassword;
+const resetPassword = async (email, token, newPassword) => {
+    const user = await UserModel_1.default.findOne({
+        email: email.toLowerCase(),
+    }).select('+resetPasswordTokenHash +resetPasswordTokenExpiry');
+    if (!user) {
+        throw new appError_1.default(404, 'User not found');
+    }
+    if (!user.resetPasswordTokenHash) {
+        throw new appError_1.default(400, 'Invalid reset token');
+    }
+    const isMatch = await (0, helper_1.comparePassword)(token, user.resetPasswordTokenHash);
+    if (!isMatch) {
+        throw new appError_1.default(400, 'Invalid reset token');
+    }
+    if (user.resetPasswordTokenExpiry < new Date()) {
+        throw new appError_1.default(400, 'Reset token has expired');
+    }
+    const hashedPassword = await (0, helper_1.hashPassword)(newPassword);
+    user.password = hashedPassword;
+    user.resetPasswordTokenHash = undefined;
+    user.resetPasswordTokenExpiry = undefined;
+    await user.save();
+    return (0, sanitizeUser_1.default)(user);
+};
+exports.resetPassword = resetPassword;

@@ -43,9 +43,16 @@ const validateSchemaPayload_1 = __importDefault(require("../utils/validateSchema
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const restrictMiddleware_1 = require("../middleware/restrictMiddleware");
 const authRouter = (0, express_1.Router)();
-authRouter.post('/register', (0, validateSchemaPayload_1.default)(userValidation_1.default), authController_1.register);
+authRouter.post('/register', authMiddleware_1.authMiddleware, (0, validateSchemaPayload_1.default)(userValidation_1.default), authController_1.register);
 authRouter.post('/login', (0, validateSchemaPayload_1.default)(userValidation_1.loginSchema), authController_1.login);
 authRouter.get('/me', authMiddleware_1.authMiddleware, authController_1.meController);
+authRouter.get('/doctors', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('admin', 'receptionist'), authController_1.getDoctorsController);
+authRouter.get('/patients', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('admin', 'receptionist'), authController_1.getPatientController);
+authRouter.get('/nurses', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('admin', 'receptionist'), authController_1.getNurseController);
+authRouter.get('/receptionists', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('admin', 'receptionist'), authController_1.getReceptionistController);
 authRouter.patch('/duty-status', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('doctor', 'nurse', 'receptionist'), (0, validateSchemaPayload_1.default)(userValidation_1.updateDutyStatusSchema), authController_1.updateDutyStatusController);
 authRouter.patch('/availability-status', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('doctor', 'nurse', 'receptionist'), (0, validateSchemaPayload_1.default)(userValidation_1.updateAvailabilityStatusSchema), authController_1.updateAvailabilityStatusController);
+authRouter.patch('/update-password', authMiddleware_1.authMiddleware, (0, restrictMiddleware_1.restrictMiddleware)('doctor', 'nurse', 'receptionist', 'admin', 'patient'), authController_1.updatePasswordController);
+authRouter.post('/forgot-password', authController_1.forgetPasswordController);
+authRouter.post('/reset-password', authController_1.resetPasswordController);
 exports.default = authRouter;
