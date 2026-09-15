@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import { FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -25,12 +24,25 @@ import { Label } from '@/components/ui/label';
 import { PatientSelect } from '@/components/reception/PatientSelect';
 import { PatientAvatar } from '@/components/reception/PatientAvatar';
 import { ReceptionDatePicker } from '@/components/reception/ReceptionDatePicker';
-import {
-  appointmentPriorityOptions,
-  appointmentTypeOptions,
-} from '@/data/receptionistAppointments';
-import { doctorsOnDuty, getDoctorById } from '@/data/receptionistDoctors';
+import { useDoctorsList } from '@/hooks/useAuth';
+import { useDepartments } from '@/hooks/useDepartments';
 import { getPatientById } from '@/data/receptionistPatients';
+
+const appointmentTypeOptions = [
+  { value: 'newPaitent', label: 'New Patient' },
+  { value: 'follow-up', label: 'Follow-up' },
+  { value: 'consultation', label: 'Consultation' },
+  { value: 'check-up', label: 'Check-up' },
+  { value: 'procedure', label: 'Procedure' },
+];
+
+const appointmentPriorityOptions = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'urgent', label: 'Urgent' },
+  { value: 'emergency', label: 'Emergency' },
+];
+
+const doctorName = (doctor) => `${doctor.firstName ?? ''} ${doctor.lastName ?? ''}`.trim();
 
 function AppointmentForm({
   appointment,
@@ -47,26 +59,27 @@ function AppointmentForm({
     existingPatient ?? initialPatient ?? null
   );
   const [doctorId, setDoctorId] = useState(appointment?.doctorId ?? '');
+  const [departmentId, setDepartmentId] = useState(
+    appointment?.departmentId ?? ''
+  );
   const [date, setDate] = useState(appointment?.date ?? '');
   const [time, setTime] = useState(appointment?.time ?? '');
   const [type, setType] = useState(appointment?.type ?? '');
-  const [priority, setPriority] = useState(appointment?.priority ?? 'Normal');
-  const [reasonForVisit, setReasonForVisit] = useState(
-    appointment?.reasonForVisit ?? ''
-  );
+  const [priority, setPriority] = useState(appointment?.priority ?? 'normal');
   const [errors, setErrors] = useState({});
 
-  const selectedDoctor = getDoctorById(doctorId);
+  const { data: doctors = [] } = useDoctorsList();
+  const { data: departments = [] } = useDepartments();
 
   const handleSave = () => {
     const nextErrors = {};
     if (!isReschedule && !patient) nextErrors.patient = 'Select a patient';
     if (!doctorId) nextErrors.doctorId = 'Select a doctor';
+    if (!isReschedule && !departmentId)
+      nextErrors.departmentId = 'Select a department';
     if (!date) nextErrors.date = 'Select a date';
     if (!time.trim()) nextErrors.time = 'Enter an appointment time';
     if (!isReschedule && !type) nextErrors.type = 'Select an appointment type';
-    if (!isReschedule && !reasonForVisit.trim())
-      nextErrors.reasonForVisit = 'Reason for visit is required';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -74,19 +87,19 @@ function AppointmentForm({
     if (isReschedule) {
       onSave(appointment.id, { date, time });
       toast.success('Appointment rescheduled');
+      onOpenChange(false);
     } else {
       onSave({
         patientId: patient.id,
         doctorId,
+        departmentId,
         date,
         time: time.trim(),
         type,
         priority,
-        reasonForVisit: reasonForVisit.trim(),
       });
-      toast.success('Appointment created');
+      onOpenChange(false);
     }
-    onOpenChange(false);
   };
 
   return (
@@ -122,9 +135,9 @@ function AppointmentForm({
                 <SelectValue placeholder="Select doctor" />
               </SelectTrigger>
               <SelectContent>
-                {doctorsOnDuty.map((doctor) => (
-                  <SelectItem key={doctor.id} value={doctor.id}>
-                    {doctor.name} — {doctor.department}
+                {doctors.map((doctor) => (
+                  <SelectItem key={doctor._id} value={doctor._id}>
+                    {doctorName(doctor)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -132,12 +145,29 @@ function AppointmentForm({
             {errors.doctorId && <FieldError>{errors.doctorId}</FieldError>}
           </div>
           <div className="space-y-1">
-            <FieldLabel>Department</FieldLabel>
-            <Input
-              value={selectedDoctor?.department ?? ''}
-              disabled
-              placeholder="Auto-filled from doctor"
-            />
+            <FieldLabel>Department *</FieldLabel>
+            <Select
+              value={departmentId}
+              onValueChange={setDepartmentId}
+              disabled={isReschedule}
+            >
+              <SelectTrigger
+                className="w-full"
+                aria-invalid={!!errors.departmentId}
+              >
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((department) => (
+                  <SelectItem key={department.id} value={department.id}>
+                    {department.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.departmentId && (
+              <FieldError>{errors.departmentId}</FieldError>
+            )}
           </div>
           <div className="space-y-1">
             <FieldLabel>Appointment Date *</FieldLabel>
@@ -149,7 +179,7 @@ function AppointmentForm({
             <Input
               value={time}
               onChange={(event) => setTime(event.target.value)}
-              placeholder="e.g. 10:30 AM"
+              placeholder="e.g. 10:30 - 11:00"
               aria-invalid={!!errors.time}
             />
             {errors.time && <FieldError>{errors.time}</FieldError>}
@@ -163,8 +193,8 @@ function AppointmentForm({
                 </SelectTrigger>
                 <SelectContent>
                   {appointmentTypeOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -175,39 +205,24 @@ function AppointmentForm({
         </div>
 
         {!isReschedule && (
-          <>
-            <div className="space-y-1">
-              <FieldLabel>Priority</FieldLabel>
-              <RadioGroup
-                value={priority}
-                onValueChange={setPriority}
-                className="flex flex-wrap gap-4"
-              >
-                {appointmentPriorityOptions.map((option) => (
-                  <Label
-                    key={option}
-                    className="flex items-center gap-2 text-sm font-normal"
-                  >
-                    <RadioGroupItem value={option} />
-                    {option}
-                  </Label>
-                ))}
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-1">
-              <FieldLabel>Reason for Visit *</FieldLabel>
-              <Textarea
-                value={reasonForVisit}
-                onChange={(event) => setReasonForVisit(event.target.value)}
-                className="min-h-16 resize-none"
-                aria-invalid={!!errors.reasonForVisit}
-              />
-              {errors.reasonForVisit && (
-                <FieldError>{errors.reasonForVisit}</FieldError>
-              )}
-            </div>
-          </>
+          <div className="space-y-1">
+            <FieldLabel>Priority</FieldLabel>
+            <RadioGroup
+              value={priority}
+              onValueChange={setPriority}
+              className="flex flex-wrap gap-4"
+            >
+              {appointmentPriorityOptions.map((option) => (
+                <Label
+                  key={option.value}
+                  className="flex items-center gap-2 text-sm font-normal"
+                >
+                  <RadioGroupItem value={option.value} />
+                  {option.label}
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
         )}
       </div>
 

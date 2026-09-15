@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PatientAvatar } from '@/components/reception/PatientAvatar';
-import { patients } from '@/data/receptionistPatients';
+import { usePatientsList } from '@/hooks/useAuth';
+
+const normalizePatient = (patient) => ({
+  id: patient._id ?? patient.id,
+  name: `${patient.firstName ?? ''} ${patient.lastName ?? ''}`.trim() || 'Unknown',
+  age: patient.age,
+  gender: patient.gender,
+});
 
 export function PatientSelect({ selectedPatient, onChange, placeholder = 'Search by patient name or ID...' }) {
   const [query, setQuery] = useState('');
+  const { data: patientsData = [] } = usePatientsList();
+  const patients = useMemo(() => patientsData.map(normalizePatient), [patientsData]);
 
   if (selectedPatient) {
     return (

@@ -26,13 +26,44 @@ const appointmentSchema = new Schema(
       type: Date,
       required: true,
     },
+    appoinmentTime: {
+      type: String,
+    },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'cancelled', 'rejected', 'completed'],
-      default: 'pending',
+      enum: ['scheduled', 'confirmed', 'cancelled', 'rejected', 'completed'],
+      default: 'scheduled',
+    },
+    priority: {
+      type: String,
+      enum: ['normal', 'urgent', 'emergency'],
+    },
+    department: {
+      type: Types.ObjectId,
+      ref: 'Department',
+      required: true,
+    },
+    appoinmentType: {
+      type: String,
+      enum: [
+        'follow-up',
+        'newPaitent',
+        'consultation',
+        'check-up',
+        'procedure',
+      ],
     },
   },
   {
     timestamps: true,
   }
 );
+
+type AppoinmentType = InferSchemaType<typeof appointmentSchema>;
+
+const appoinmentModel =
+  models.appoinment || model<AppoinmentType>('appoinment', appointmentSchema);
+
+export default appoinmentModel;
+
+export type { AppoinmentType };

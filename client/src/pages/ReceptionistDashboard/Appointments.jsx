@@ -15,18 +15,37 @@ import { AppointmentsTable } from '@/components/reception/appointments/Appointme
 import { AppointmentDialog } from '@/components/dialogs/receptionist/AppointmentDialog';
 import { AppointmentDetailsDialog } from '@/components/dialogs/receptionist/AppointmentDetailsDialog';
 import { DeleteConfirmDialog } from '@/components/dialogs/common/DeleteConfirmDialog';
-import { useAppointments } from '@/hooks/useAppointments';
-import { createAppointment, rescheduleAppointment, cancelAppointment } from '@/services/appointmentService';
-import { appointmentStatusOptions } from '@/data/receptionistAppointments';
-import { doctorsOnDuty, departmentOptions } from '@/data/receptionistDoctors';
-import { getPatientById } from '@/data/receptionistPatients';
+import { useAppointmentsList, useCreateAppointment } from '@/hooks/useAppointmentsApi';
+import { useDoctorsList } from '@/hooks/useAuth';
+import { useDepartments } from '@/hooks/useDepartments';
+import { useAuthStore } from '@/store/authstore';
 
 const PAGE_SIZE = 7;
-const TODAY_LABEL = '09 Aug 2026';
+
+const appointmentStatusOptions = ['Scheduled', 'Confirmed', 'Completed', 'Cancelled', 'Rejected'];
+
+const doctorName = (doctor) => `${doctor.firstName ?? ''} ${doctor.lastName ?? ''}`.trim();
 
 const Appointments = () => {
   const navigate = useNavigate();
-  const { appointments, setAppointments, isLoading, error, reload } = useAppointments();
+  const user = useAuthStore((state) => state.user);
+  const { data: appointmentsData = [], isLoading, error, refetch } = useAppointmentsList();
+  const { data: doctors = [] } = useDoctorsList();
+  const { data: departments = [] } = useDepartments();
+  const createAppointment = useCreateAppointment();
+
+  // Reschedule/cancel aren't backed by an API endpoint yet, so local edits
+  // are layered over the fetched list until a PATCH/DELETE endpoint exists.
+  const [localOverrides, setLocalOverrides] = useState({});
+  const appointments = useMemo(
+    () =>
+      appointmentsData.map((appointment) =>
+        localOverrides[appointment.id]
+          ? { ...appointment, ...localOverrides[appointment.id] }
+          : appointment
+      ),
+    [appointmentsData, localOverrides]
+  );
 
   const [view, setView] = useState('all');
   const [search, setSearch] = useState('');
@@ -40,7 +59,7 @@ const Appointments = () => {
 
   const filteredAppointments = useMemo(() => {
     const query = search.trim().toLowerCase();
-    const today = new Date(TODAY_LABEL);
+    const today = new Date();
 
     return appointments.filter((appointment) => {
       const matchesSearch =
@@ -51,10 +70,11 @@ const Appointments = () => {
       const matchesDoctor = doctorId === 'all' || appointment.doctorId === doctorId;
       const matchesDepartment = department === 'all' || appointment.department === department;
       const matchesStatus = status === 'all' || appointment.status === status;
+      const appointmentDate = new Date(appointment.date);
       const matchesView =
         view === 'all' ||
-        (view === 'today' && appointment.date === TODAY_LABEL) ||
-        (view === 'upcoming' && new Date(appointment.date) > today);
+        (view === 'today' && appointmentDate.toDateString() === today.toDateString()) ||
+        (view === 'upcoming' && appointmentDate > today);
 
       return matchesSearch && matchesDoctor && matchesDepartment && matchesStatus && matchesView;
     });
@@ -87,35 +107,40 @@ const Appointments = () => {
   };
 
   const handleCreate = (payload) => {
-    createAppointment(payload).then((created) => {
-      const doctor = doctorsOnDuty.find((doc) => doc.id === payload.doctorId);
-      setAppointments((current) => [
-        {
-          ...created,
-          patientName: getPatientById(payload.patientId)?.name ?? 'Unknown Patient',
-          doctorName: doctor?.name ?? 'Unknown Doctor',
-          department: doctor?.department ?? '—',
-        },
-        ...current,
-      ]);
-    });
+    createAppointment.mutate(
+      {
+        patient: payload.patientId,
+        doctor: payload.doctorId,
+        hospital: user?.hospitalId,
+        department: payload.departmentId,
+        appointmentDate: payload.date,
+        appoinmentTime: payload.time,
+        priority: payload.priority,
+        appoinmentType: payload.type,
+      },
+      {
+        onSuccess: () => toast.success('Appointment created'),
+        onError: (err) =>
+          toast.error(err.response?.data?.message ?? 'Failed to create appointment'),
+      }
+    );
   };
 
   const handleReschedule = (appointmentId, payload) => {
-    rescheduleAppointment(appointmentId, payload).then(() => {
-      setAppointments((current) => current.map((appt) => (appt.id === appointmentId ? { ...appt, ...payload } : appt)));
-    });
+    setLocalOverrides((current) => ({
+      ...current,
+      [appointmentId]: { ...current[appointmentId], ...payload },
+    }));
   };
 
   const handleCancel = () => {
     if (!activeAppointment) return;
-    cancelAppointment(activeAppointment.id).then(() => {
-      setAppointments((current) =>
-        current.map((appt) => (appt.id === activeAppointment.id ? { ...appt, status: 'Cancelled' } : appt))
-      );
-      setOpenDialog(null);
-      toast.success('Appointment cancelled');
-    });
+    setLocalOverrides((current) => ({
+      ...current,
+      [activeAppointment.id]: { ...current[activeAppointment.id], status: 'Cancelled' },
+    }));
+    setOpenDialog(null);
+    toast.success('Appointment cancelled');
   };
 
   return (
@@ -139,7 +164,7 @@ const Appointments = () => {
       </Tabs>
 
       {error ? (
-        <ErrorState onRetry={reload} />
+        <ErrorState onRetry={refetch} />
       ) : (
         <Card className="gap-0 overflow-hidden rounded-xl border-border py-0 shadow-sm">
           <div className="border-b border-border p-5">
@@ -152,13 +177,13 @@ const Appointments = () => {
                   label="Doctor"
                   value={doctorId}
                   onChange={(value) => { setDoctorId(value); resetPage(); }}
-                  options={doctorsOnDuty.map((doctor) => ({ value: doctor.id, label: doctor.name }))}
+                  options={doctors.map((doctor) => ({ value: doctor._id, label: doctorName(doctor) }))}
                 />
                 <FilterDropdown
                   label="Department"
                   value={department}
                   onChange={(value) => { setDepartment(value); resetPage(); }}
-                  options={departmentOptions.map((dept) => ({ value: dept, label: dept }))}
+                  options={departments.map((dept) => ({ value: dept.name, label: dept.name }))}
                 />
                 <FilterDropdown
                   label="Status"
