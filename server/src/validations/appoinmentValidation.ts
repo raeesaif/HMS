@@ -13,8 +13,14 @@ const createAppoinmentSchema = z.object({
   hospital: objectId('Valid hospital id is required'),
   department: objectId('Valid department id is required'),
 
-  appointmentDate: z.coerce.date({ error: 'Valid appointment date is required' }),
-  appoinmentTime: z.string().trim().min(1, 'Appointment time is required').optional(),
+  appointmentDate: z.coerce.date({
+    error: 'Valid appointment date is required',
+  }),
+  appoinmentTime: z
+    .string()
+    .trim()
+    .min(1, 'Appointment time is required')
+    .optional(),
 
   priority: z.enum(['normal', 'urgent', 'emergency']).optional(),
 
@@ -29,4 +35,12 @@ const updateAppoinmentSchema = createAppoinmentSchema.partial().extend({
     .optional(),
 });
 
-export { createAppoinmentSchema, updateAppoinmentSchema };
+const cancelAppoinmentSchema = z.object({
+  cancelreason: z.string().trim().min(1, 'Cancel reason is required'),
+});
+
+export {
+  createAppoinmentSchema,
+  updateAppoinmentSchema,
+  cancelAppoinmentSchema,
+};

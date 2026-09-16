@@ -96,13 +96,39 @@ const getAvailableSlotsService = async (doctorId: string, date: string) => {
     status: { $in: ['scheduled', 'confirmed'] },
   });
 
-  const bookedSlots = new Set(bookedAppointments.map((appt) => appt.appoinmentTime));
+  const bookedSlots = new Set(
+    bookedAppointments.map((appt) => appt.appoinmentTime)
+  );
 
   return allSlots.filter((slot) => !bookedSlots.has(slot));
+};
+
+const cancelAppoinmentService = async (id: string, cancelreason: string) => {
+  const appoinment = await appoinmentModel.findByIdAndUpdate(
+    id,
+    { status: 'cancelled', cancelreason },
+    { new: true }
+  );
+
+  if (!appoinment) {
+    throw new AppError(404, 'Appoinment not found');
+  }
+
+  return appoinment;
+};
+
+const deleteAppoinmentService = async (id: string) => {
+  const appoinment = await appoinmentModel.findByIdAndDelete(id);
+
+  if (!appoinment) {
+    throw new AppError(404, 'Appoinment not found');
+  }
 };
 
 export {
   CreateAppoinmentService,
   getAllappoinmentService,
   getAvailableSlotsService,
+  deleteAppoinmentService,
+  cancelAppoinmentService,
 };

@@ -53,6 +53,10 @@ const appointmentSchema = new mongoose_1.Schema({
             'procedure',
         ],
     },
+    cancelreason: {
+        type: String,
+        required: false,
+    },
     createdBy: {
         type: mongoose_1.Types.ObjectId,
         ref: 'User',

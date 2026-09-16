@@ -23,3 +23,19 @@ export const useAvailableSlots = (doctorId, date) => {
     enabled: Boolean(doctorId && date),
   });
 };
+
+export const useCancelAppointment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, cancelreason }) => appointmentAPI.cancel(id, cancelreason),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+};
+
+export const useDeleteAppointment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => appointmentAPI.remove(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+};

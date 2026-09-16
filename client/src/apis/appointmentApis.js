@@ -71,4 +71,12 @@ export const appointmentAPI = {
     });
     return response.data.data;
   },
+  cancel: async (id, cancelreason) => {
+    const response = await apiClient.patch(`/appoinment/${id}/cancel`, { cancelreason });
+    return normalize(response.data.data);
+  },
+  remove: async (id) => {
+    const response = await apiClient.delete(`/appoinment/${id}`);
+    return response.data;
+  },
 };

@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAvailableSlotsService = exports.getAllappoinmentService = exports.CreateAppoinmentService = void 0;
+exports.cancelAppoinmentService = exports.deleteAppoinmentService = exports.getAvailableSlotsService = exports.getAllappoinmentService = exports.CreateAppoinmentService = void 0;
 const AppointmentModel_1 = __importDefault(require("../models/AppointmentModel"));
 const UserModel_1 = __importStar(require("../models/UserModel"));
 const appError_1 = __importDefault(require("../utils/appError"));
@@ -118,3 +118,18 @@ const getAvailableSlotsService = async (doctorId, date) => {
     return allSlots.filter((slot) => !bookedSlots.has(slot));
 };
 exports.getAvailableSlotsService = getAvailableSlotsService;
+const cancelAppoinmentService = async (id, cancelreason) => {
+    const appoinment = await AppointmentModel_1.default.findByIdAndUpdate(id, { status: 'cancelled', cancelreason }, { new: true });
+    if (!appoinment) {
+        throw new appError_1.default(404, 'Appoinment not found');
+    }
+    return appoinment;
+};
+exports.cancelAppoinmentService = cancelAppoinmentService;
+const deleteAppoinmentService = async (id) => {
+    const appoinment = await AppointmentModel_1.default.findByIdAndDelete(id);
+    if (!appoinment) {
+        throw new appError_1.default(404, 'Appoinment not found');
+    }
+};
+exports.deleteAppoinmentService = deleteAppoinmentService;

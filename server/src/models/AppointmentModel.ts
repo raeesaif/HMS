@@ -53,6 +53,10 @@ const appointmentSchema = new Schema(
         'procedure',
       ],
     },
+    cancelreason: {
+      type: String,
+      required: false,
+    },
     createdBy: {
       type: Types.ObjectId,
       ref: 'User',

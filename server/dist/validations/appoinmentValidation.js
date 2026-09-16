@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAppoinmentSchema = exports.createAppoinmentSchema = void 0;
+exports.cancelAppoinmentSchema = exports.updateAppoinmentSchema = exports.createAppoinmentSchema = void 0;
 const mongoose_1 = require("mongoose");
 const zod_1 = require("zod");
 const objectId = (message) => zod_1.z
@@ -12,8 +12,14 @@ const createAppoinmentSchema = zod_1.z.object({
     doctor: objectId('Valid doctor id is required'),
     hospital: objectId('Valid hospital id is required'),
     department: objectId('Valid department id is required'),
-    appointmentDate: zod_1.z.coerce.date({ error: 'Valid appointment date is required' }),
-    appoinmentTime: zod_1.z.string().trim().min(1, 'Appointment time is required').optional(),
+    appointmentDate: zod_1.z.coerce.date({
+        error: 'Valid appointment date is required',
+    }),
+    appoinmentTime: zod_1.z
+        .string()
+        .trim()
+        .min(1, 'Appointment time is required')
+        .optional(),
     priority: zod_1.z.enum(['normal', 'urgent', 'emergency']).optional(),
     appoinmentType: zod_1.z
         .enum(['follow-up', 'newPaitent', 'consultation', 'check-up', 'procedure'])
@@ -26,3 +32,7 @@ const updateAppoinmentSchema = createAppoinmentSchema.partial().extend({
         .optional(),
 });
 exports.updateAppoinmentSchema = updateAppoinmentSchema;
+const cancelAppoinmentSchema = zod_1.z.object({
+    cancelreason: zod_1.z.string().trim().min(1, 'Cancel reason is required'),
+});
+exports.cancelAppoinmentSchema = cancelAppoinmentSchema;

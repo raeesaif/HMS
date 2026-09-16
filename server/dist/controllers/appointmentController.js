@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAvailableSlotsController = exports.getAppoinmentController = exports.createAppoinmentController = void 0;
+exports.deleteAppoinmentController = exports.cancelAppoinmentController = exports.getAvailableSlotsController = exports.getAppoinmentController = exports.createAppoinmentController = void 0;
 const appointmentService_1 = require("../services/appointmentService");
 const apiResponse_1 = __importDefault(require("../utils/apiResponse"));
 const appError_1 = __importDefault(require("../utils/appError"));
@@ -28,3 +28,13 @@ const getAvailableSlotsController = (0, catchAsync_1.default)(async (req, res) =
     apiResponse_1.default.success(res, slots, 'Available slots fetched successfully', 200);
 });
 exports.getAvailableSlotsController = getAvailableSlotsController;
+const cancelAppoinmentController = (0, catchAsync_1.default)(async (req, res) => {
+    const appoinment = await (0, appointmentService_1.cancelAppoinmentService)(String(req.params.id), req.body.cancelreason);
+    apiResponse_1.default.success(res, appoinment, 'Appoinment cancelled successfully', 200);
+});
+exports.cancelAppoinmentController = cancelAppoinmentController;
+const deleteAppoinmentController = (0, catchAsync_1.default)(async (req, res) => {
+    await (0, appointmentService_1.deleteAppoinmentService)(String(req.params.id));
+    apiResponse_1.default.success(res, null, 'Appoinment deleted successfully', 200);
+});
+exports.deleteAppoinmentController = deleteAppoinmentController;

@@ -14,8 +14,14 @@ import { FiltersSkeleton, TableSkeleton } from '@/components/reception/LoadingSk
 import { AppointmentsTable } from '@/components/reception/appointments/AppointmentsTable';
 import { AppointmentDialog } from '@/components/dialogs/receptionist/AppointmentDialog';
 import { AppointmentDetailsDialog } from '@/components/dialogs/receptionist/AppointmentDetailsDialog';
+import { CancelAppointmentDialog } from '@/components/dialogs/receptionist/CancelAppointmentDialog';
 import { DeleteConfirmDialog } from '@/components/dialogs/common/DeleteConfirmDialog';
-import { useAppointmentsList, useCreateAppointment } from '@/hooks/useAppointmentsApi';
+import {
+  useAppointmentsList,
+  useCreateAppointment,
+  useCancelAppointment,
+  useDeleteAppointment,
+} from '@/hooks/useAppointmentsApi';
 import { useDoctorsList } from '@/hooks/useAuth';
 import { useDepartments } from '@/hooks/useDepartments';
 import { useAuthStore } from '@/store/authstore';
@@ -33,9 +39,11 @@ const Appointments = () => {
   const { data: doctors = [] } = useDoctorsList();
   const { data: departments = [] } = useDepartments();
   const createAppointment = useCreateAppointment();
+  const cancelAppointment = useCancelAppointment();
+  const deleteAppointment = useDeleteAppointment();
 
-  // Reschedule/cancel aren't backed by an API endpoint yet, so local edits
-  // are layered over the fetched list until a PATCH/DELETE endpoint exists.
+  // Reschedule isn't backed by an API endpoint yet, so local edits are
+  // layered over the fetched list until a PATCH endpoint exists for it.
   const [localOverrides, setLocalOverrides] = useState({});
   const appointments = useMemo(
     () =>
@@ -133,14 +141,31 @@ const Appointments = () => {
     }));
   };
 
-  const handleCancel = () => {
+  const handleCancel = (cancelreason) => {
     if (!activeAppointment) return;
-    setLocalOverrides((current) => ({
-      ...current,
-      [activeAppointment.id]: { ...current[activeAppointment.id], status: 'Cancelled' },
-    }));
-    setOpenDialog(null);
-    toast.success('Appointment cancelled');
+    cancelAppointment.mutate(
+      { id: activeAppointment._id, cancelreason },
+      {
+        onSuccess: () => {
+          setOpenDialog(null);
+          toast.success('Appointment cancelled');
+        },
+        onError: (err) =>
+          toast.error(err.response?.data?.message ?? 'Failed to cancel appointment'),
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    if (!activeAppointment) return;
+    deleteAppointment.mutate(activeAppointment._id, {
+      onSuccess: () => {
+        setOpenDialog(null);
+        toast.success('Appointment deleted');
+      },
+      onError: (err) =>
+        toast.error(err.response?.data?.message ?? 'Failed to delete appointment'),
+    });
   };
 
   return (
@@ -221,13 +246,20 @@ const Appointments = () => {
         onSave={handleReschedule}
       />
       <AppointmentDetailsDialog appointment={activeAppointment} open={openDialog === 'view'} onOpenChange={closeDialog} />
-      <DeleteConfirmDialog
+      <CancelAppointmentDialog
+        appointment={activeAppointment}
         open={openDialog === 'cancel'}
         onOpenChange={closeDialog}
-        title="Cancel this appointment?"
-        description={activeAppointment ? `This will cancel the appointment for ${activeAppointment.patientName}.` : undefined}
-        confirmLabel="Cancel Appointment"
         onConfirm={handleCancel}
+        isSubmitting={cancelAppointment.isPending}
+      />
+      <DeleteConfirmDialog
+        open={openDialog === 'delete'}
+        onOpenChange={closeDialog}
+        title="Delete this appointment?"
+        description={activeAppointment ? `This will permanently delete the appointment record for ${activeAppointment.patientName}. This cannot be undone.` : undefined}
+        confirmLabel="Delete Appointment"
+        onConfirm={handleDelete}
       />
     </div>
   );

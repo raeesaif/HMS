@@ -1,9 +1,9 @@
-import { CalendarClock, ClipboardCheck, Eye, MoreVertical, XCircle } from 'lucide-react';
+import { CalendarClock, ClipboardCheck, Eye, MoreVertical, Trash2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export function AppointmentsActionsMenu({ appointment, onAction }) {
-  const isFinal = ['Completed', 'Cancelled', 'No Show'].includes(appointment.status);
+  const isFinal = ['Completed', 'Cancelled', 'Rejected'].includes(appointment.status);
 
   return (
     <DropdownMenu>
@@ -25,6 +25,14 @@ export function AppointmentsActionsMenu({ appointment, onAction }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onClick={() => onAction('cancel', appointment)}>
               <XCircle /> Cancel
+            </DropdownMenuItem>
+          </>
+        )}
+        {isFinal && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={() => onAction('delete', appointment)}>
+              <Trash2 /> Delete
             </DropdownMenuItem>
           </>
         )}

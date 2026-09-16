@@ -2,6 +2,8 @@ import {
   CreateAppoinmentService,
   getAllappoinmentService,
   getAvailableSlotsService,
+  deleteAppoinmentService,
+  cancelAppoinmentService,
 } from '@src/services/appointmentService';
 import apiResponse from '@src/utils/apiResponse';
 import AppError from '@src/utils/appError';
@@ -42,12 +44,44 @@ const getAvailableSlotsController = catchAsync(
     }
 
     const slots = await getAvailableSlotsService(doctor, date);
-    apiResponse.success(res, slots, 'Available slots fetched successfully', 200);
+    apiResponse.success(
+      res,
+      slots,
+      'Available slots fetched successfully',
+      200
+    );
   }
 );
+
+const cancelAppoinmentController = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const appoinment = await cancelAppoinmentService(
+      String(req.params.id),
+      req.body.cancelreason
+    );
+    apiResponse.success(
+      res,
+      appoinment,
+      'Appoinment cancelled successfully',
+      200
+    );
+  }
+);
+
+
+const deleteAppoinmentController = catchAsync(
+    async (req: Request, res: Response): Promise<void> => {
+      await deleteAppoinmentService(String(req.params.id));
+      apiResponse.success(res, null, 'Appoinment deleted successfully', 200);
+    }
+)
+
+
 
 export {
   createAppoinmentController,
   getAppoinmentController,
   getAvailableSlotsController,
+  cancelAppoinmentController,
+  deleteAppoinmentController
 };
