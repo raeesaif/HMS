@@ -1,8 +1,10 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function FilterDropdown({ label, value, onChange, options, allLabel = 'All', className = '' }) {
+  const items = [{ value: 'all', label: allLabel }, ...options];
+
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value} onValueChange={onChange} items={items}>
       <SelectTrigger className={`w-full sm:w-40 ${className}`} aria-label={label}>
         <SelectValue placeholder={label} />
       </SelectTrigger>

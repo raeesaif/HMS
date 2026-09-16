@@ -53,6 +53,10 @@ const appointmentSchema = new Schema(
         'procedure',
       ],
     },
+    createdBy: {
+      type: Types.ObjectId,
+      ref: 'User',
+    },
   },
   {
     timestamps: true,

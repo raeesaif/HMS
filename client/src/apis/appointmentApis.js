@@ -44,6 +44,16 @@ const normalize = (appointment) => ({
   type: TYPE_LABELS[appointment.appoinmentType] ?? appointment.appoinmentType ?? '—',
   status: STATUS_LABELS[appointment.status] ?? appointment.status,
   priority: PRIORITY_LABELS[appointment.priority] ?? appointment.priority,
+  createdBy: appointment.createdBy ? personName(appointment.createdBy) : '—',
+  createdAt: appointment.createdAt
+    ? new Date(appointment.createdAt).toLocaleString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '—',
 });
 
 export const appointmentAPI = {
@@ -54,5 +64,11 @@ export const appointmentAPI = {
   create: async (data) => {
     const response = await apiClient.post('/appoinment', data);
     return normalize(response.data.data);
+  },
+  getAvailableSlots: async (doctorId, date) => {
+    const response = await apiClient.get('/appoinment/available-slots', {
+      params: { doctor: doctorId, date },
+    });
+    return response.data.data;
   },
 };

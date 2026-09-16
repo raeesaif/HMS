@@ -15,3 +15,11 @@ export const useCreateAppointment = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['appointments'] }),
   });
 };
+
+export const useAvailableSlots = (doctorId, date) => {
+  return useQuery({
+    queryKey: ['appointment-slots', doctorId, date],
+    queryFn: () => appointmentAPI.getAvailableSlots(doctorId, date),
+    enabled: Boolean(doctorId && date),
+  });
+};

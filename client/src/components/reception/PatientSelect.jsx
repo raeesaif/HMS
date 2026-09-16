@@ -7,6 +7,7 @@ import { usePatientsList } from '@/hooks/useAuth';
 
 const normalizePatient = (patient) => ({
   id: patient._id ?? patient.id,
+  displayId: patient.userId ?? patient._id ?? patient.id,
   name: `${patient.firstName ?? ''} ${patient.lastName ?? ''}`.trim() || 'Unknown',
   age: patient.age,
   gender: patient.gender,
@@ -25,7 +26,7 @@ export function PatientSelect({ selectedPatient, onChange, placeholder = 'Search
           <div>
             <p className="text-sm font-medium text-slate-900">{selectedPatient.name}</p>
             <p className="text-xs text-slate-500">
-              {selectedPatient.id} · {selectedPatient.age} yrs · {selectedPatient.gender}
+              {selectedPatient.displayId ?? selectedPatient.id} · {selectedPatient.age} yrs · {selectedPatient.gender}
             </p>
           </div>
         </div>
@@ -41,7 +42,7 @@ export function PatientSelect({ selectedPatient, onChange, placeholder = 'Search
         .filter(
           (patient) =>
             patient.name.toLowerCase().includes(query.trim().toLowerCase()) ||
-            patient.id.toLowerCase().includes(query.trim().toLowerCase())
+            patient.displayId.toLowerCase().includes(query.trim().toLowerCase())
         )
         .slice(0, 6)
     : [];
@@ -69,7 +70,7 @@ export function PatientSelect({ selectedPatient, onChange, placeholder = 'Search
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-900">{patient.name}</p>
                   <p className="text-xs text-slate-500">
-                    {patient.id} · {patient.age} yrs · {patient.gender}
+                    {patient.displayId} · {patient.age} yrs · {patient.gender}
                   </p>
                 </div>
               </button>

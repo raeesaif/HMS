@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createAppoinmentController,
   getAppoinmentController,
+  getAvailableSlotsController,
 } from '@src/controllers/appointmentController';
 import { authMiddleware } from '@src/middleware/authMiddleware';
 import validateSchemaPayload from '@src/utils/validateSchemaPayload';
@@ -21,4 +22,11 @@ appoinmentRouter.get(
   authMiddleware,
   getAppoinmentController
 );
+
+appoinmentRouter.get(
+  '/appoinment/available-slots',
+  authMiddleware,
+  getAvailableSlotsController
+);
+
 export default appoinmentRouter;

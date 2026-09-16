@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FieldLabel, FieldError } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -26,6 +25,7 @@ import { PatientAvatar } from '@/components/reception/PatientAvatar';
 import { ReceptionDatePicker } from '@/components/reception/ReceptionDatePicker';
 import { useDoctorsList } from '@/hooks/useAuth';
 import { useDepartments } from '@/hooks/useDepartments';
+import { useAvailableSlots } from '@/hooks/useAppointmentsApi';
 import { getPatientById } from '@/data/receptionistPatients';
 
 const appointmentTypeOptions = [
@@ -70,6 +70,34 @@ function AppointmentForm({
 
   const { data: doctors = [] } = useDoctorsList();
   const { data: departments = [] } = useDepartments();
+  const { data: availableSlots = [], isFetching: isLoadingSlots } = useAvailableSlots(
+    doctorId,
+    date
+  );
+
+  const timeOptions = useMemo(() => {
+    const options = [...availableSlots];
+    if (time && !options.includes(time)) options.unshift(time);
+    return options;
+  }, [availableSlots, time]);
+
+  const timeSlotPlaceholder = !doctorId || !date
+    ? 'Select doctor & date first'
+    : isLoadingSlots
+      ? 'Loading available times...'
+      : timeOptions.length === 0
+        ? 'No slots available'
+        : 'Select time';
+
+  const handleDoctorChange = (value) => {
+    setDoctorId(value);
+    setTime('');
+  };
+
+  const handleDateChange = (value) => {
+    setDate(value);
+    setTime('');
+  };
 
   const handleSave = () => {
     const nextErrors = {};
@@ -125,8 +153,9 @@ function AppointmentForm({
             <FieldLabel>Doctor *</FieldLabel>
             <Select
               value={doctorId}
-              onValueChange={setDoctorId}
+              onValueChange={handleDoctorChange}
               disabled={isReschedule}
+              items={doctors.map((doctor) => ({ value: doctor._id, label: doctorName(doctor) }))}
             >
               <SelectTrigger
                 className="w-full"
@@ -150,6 +179,7 @@ function AppointmentForm({
               value={departmentId}
               onValueChange={setDepartmentId}
               disabled={isReschedule}
+              items={departments.map((department) => ({ value: department.id, label: department.name }))}
             >
               <SelectTrigger
                 className="w-full"
@@ -171,23 +201,34 @@ function AppointmentForm({
           </div>
           <div className="space-y-1">
             <FieldLabel>Appointment Date *</FieldLabel>
-            <ReceptionDatePicker date={date} onSelect={setDate} />
+            <ReceptionDatePicker date={date} onSelect={handleDateChange} />
             {errors.date && <FieldError>{errors.date}</FieldError>}
           </div>
           <div className="space-y-1">
             <FieldLabel>Appointment Time *</FieldLabel>
-            <Input
+            <Select
               value={time}
-              onChange={(event) => setTime(event.target.value)}
-              placeholder="e.g. 10:30 - 11:00"
-              aria-invalid={!!errors.time}
-            />
+              onValueChange={setTime}
+              disabled={!doctorId || !date || isLoadingSlots || timeOptions.length === 0}
+              items={timeOptions.map((slot) => ({ value: slot, label: slot }))}
+            >
+              <SelectTrigger className="w-full" aria-invalid={!!errors.time}>
+                <SelectValue placeholder={timeSlotPlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                {timeOptions.map((slot) => (
+                  <SelectItem key={slot} value={slot}>
+                    {slot}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.time && <FieldError>{errors.time}</FieldError>}
           </div>
           {!isReschedule && (
             <div className="space-y-1">
               <FieldLabel>Appointment Type *</FieldLabel>
-              <Select value={type} onValueChange={setType}>
+              <Select value={type} onValueChange={setType} items={appointmentTypeOptions}>
                 <SelectTrigger className="w-full" aria-invalid={!!errors.type}>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>

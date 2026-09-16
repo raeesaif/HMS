@@ -3,9 +3,11 @@ import { AppoinmentType } from '@src/models/AppointmentModel';
 import UserModel, { Role } from '@src/models/UserModel';
 import AppError from '@src/utils/appError';
 import { generateRandomString } from '@src/utils/helper';
+import generateTimeSlots from '@src/utils/appointmentSlots';
 
 const CreateAppoinmentService = async (
-  appoinmentData: Omit<AppoinmentType, 'appointmentId'>
+  appoinmentData: Omit<AppoinmentType, 'appointmentId'>,
+  createdBy?: string
 ) => {
   const { patient, doctor, appointmentDate, appoinmentTime } = appoinmentData;
 
@@ -40,12 +42,14 @@ const CreateAppoinmentService = async (
   const appointment = await appoinmentModel.create({
     ...appoinmentData,
     appointmentId,
+    createdBy,
   });
 
   await appointment.populate([
     { path: 'patient', select: 'firstName lastName email' },
     { path: 'doctor', select: 'firstName lastName email' },
     { path: 'department', select: 'name' },
+    { path: 'createdBy', select: 'firstName lastName' },
   ]);
 
   return appointment;
@@ -57,7 +61,48 @@ const getAllappoinmentService = async () => {
     .populate('patient', 'firstName lastName email')
     .populate('doctor', 'firstName lastName email')
     .populate('department', 'name')
+    .populate('createdBy', 'firstName lastName')
     .sort({ appointmentDate: 1 });
 };
 
-export { CreateAppoinmentService, getAllappoinmentService };
+const dayRange = (date: string | Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+  return { start, end };
+};
+
+const getAvailableSlotsService = async (doctorId: string, date: string) => {
+  const doctorDoc = await UserModel.findOne({
+    _id: doctorId,
+    role: Role.Doctor,
+  });
+  if (!doctorDoc) {
+    throw new AppError(404, 'Doctor not found');
+  }
+
+  if (!doctorDoc.shiftStart || !doctorDoc.shiftEnd) {
+    throw new AppError(400, 'Doctor has no shift timing configured');
+  }
+
+  const allSlots = generateTimeSlots(doctorDoc.shiftStart, doctorDoc.shiftEnd);
+
+  const { start, end } = dayRange(date);
+
+  const bookedAppointments = await appoinmentModel.find({
+    doctor: doctorId,
+    appointmentDate: { $gte: start, $lt: end },
+    status: { $in: ['scheduled', 'confirmed'] },
+  });
+
+  const bookedSlots = new Set(bookedAppointments.map((appt) => appt.appoinmentTime));
+
+  return allSlots.filter((slot) => !bookedSlots.has(slot));
+};
+
+export {
+  CreateAppoinmentService,
+  getAllappoinmentService,
+  getAvailableSlotsService,
+};
